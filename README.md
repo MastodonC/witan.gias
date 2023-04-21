@@ -2,11 +2,13 @@
 
 gov.uk GIAS (Get Information About Schools) data (downloaded from [get-information-schools.service.gov.uk](https://www.get-information-schools.service.gov.uk/))
 
+See the [GIAS glossary](https://www.get-information-schools.service.gov.uk/glossary) for explanations of terms.
+
 # Usage
 
 ``` clojure
-(require '[witan.gias.**** :as gias])
-(gias/**** )
+(require '[witan.gias.all-data :as gias])
+@gias/establishments ; dataset of GIAS all establishment data `edubaseall`
 ```
 
 # License
