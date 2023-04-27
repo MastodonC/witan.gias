@@ -8,7 +8,14 @@ See the [GIAS glossary](https://www.get-information-schools.service.gov.uk/gloss
 
 ``` clojure
 (require '[witan.gias.all-data :as gias])
-@gias/establishments ; dataset of GIAS all establishment data `edubaseall`
+gias/data-file-name ; Name of file containing establishment data.
+gias/col-names ; Sorted set of keywork column names for the GIAS establishment data.
+gias/col-name->csv-label ; Map keyword column names to the names used in the GIAS CSV file.
+gias/col-name->label ; Map keyword column names to descriptive labels for display.
+gias/->ds ; Dataset of GIAS all establishment data `edubaseall`.
+gias/key-col-names-for-send ; Sorted set of key GIAS columns for SEND work.
+gias/key-cols-for-send->ds ; Dataset of key GIAS columns for SEND for all establishments.
+
 ```
 
 # License
