@@ -800,3 +800,16 @@
 
 
   )
+
+
+(comment
+  ;; Write distinct establishment types to data file
+  (-> (->ds {:column-whitelist (map col-name->csv-label [:type-of-establishment-code    :type-of-establishment-name
+                                                         :establishment-type-group-code :establishment-type-group-name])
+             :dataset-name     (str (re-find #".+(?=\.csv$)" data-file-name) "-establishment-types")})
+      (tc/unique-by)
+      (tc/order-by [:type-of-establishment-code])
+      (as-> $
+          (tc/write! $ (str "./data/" (tc/dataset-name $) ".csv"))))
+  )
+
