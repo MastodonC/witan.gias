@@ -1,0 +1,38 @@
+type-of-establishment-code,type-of-establishment-name,establishment-type-group-code,establishment-type-group-name
+1,Community school,4,Local authority maintained schools
+2,Voluntary aided school,4,Local authority maintained schools
+3,Voluntary controlled school,4,Local authority maintained schools
+5,Foundation school,4,Local authority maintained schools
+6,City technology college,3,Independent schools
+7,Community special school,5,Special schools
+8,Non-maintained special school,5,Special schools
+10,Other independent special school,5,Special schools
+11,Other independent school,3,Independent schools
+12,Foundation special school,5,Special schools
+14,Pupil referral unit,4,Local authority maintained schools
+15,Local authority nursery school,4,Local authority maintained schools
+18,Further education,1,Colleges
+24,Secure units,9,Other types
+25,Offshore schools,9,Other types
+26,Service children's education,9,Other types
+27,Miscellaneous,9,Other types
+28,Academy sponsor led,10,Academies
+29,Higher education institutions,2,Universities
+30,Welsh establishment,6,Welsh schools
+31,Sixth form centres,1,Colleges
+32,Special post 16 institution,9,Other types
+33,Academy special sponsor led,10,Academies
+34,Academy converter,10,Academies
+35,Free schools,11,Free Schools
+36,Free schools special,11,Free Schools
+37,British schools overseas,9,Other types
+38,Free schools alternative provision,11,Free Schools
+39,Free schools 16 to 19,11,Free Schools
+40,University technical college,11,Free Schools
+41,Studio schools,11,Free Schools
+42,Academy alternative provision converter,10,Academies
+43,Academy alternative provision sponsor led,10,Academies
+44,Academy special converter,10,Academies
+45,Academy 16-19 converter,10,Academies
+46,Academy 16 to 19 sponsor led,10,Academies
+56,Institution funded by other government department,9,Other types
