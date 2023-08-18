@@ -11,7 +11,7 @@
 ;;; # Data files
 (def data-file-name
   "Name of file containing establishment data"
-  "edubasealldata20230421.csv")
+  "edubasealldata20230817.csv")
 
 
 
@@ -155,7 +155,8 @@
                    :ch-number
                    :msoa-code
                    :lsoa-code
-                   :fsm]
+                   :fsm
+                   :accreditation-expiry-date]
                   (iterate inc 1))]
     (into (sorted-map-by (fn [k1 k2] (compare [(get m k1) k1]
                                               [(get m k2) k2]))) m)))
@@ -308,7 +309,8 @@
          :ch-number                        "CHNumber"
          :msoa-code                        "MSOA (code)"
          :lsoa-code                        "LSOA (code)"
-         :fsm                              "FSM"}))
+         :fsm                              "FSM"
+         :accreditation-expiry-date        "AccreditationExpiryDate"}))
 
 (comment
   ;; Keyword column names created from CSV column lables using:
@@ -466,7 +468,8 @@
          :ch-number                        "CH number"
          :msoa-code                        "MSOA (code)"
          :lsoa-code                        "LSOA (code)"
-         :fsm                              "FSM"}))
+         :fsm                              "FSM"
+         :accreditation-expiry-date        "Accreditation expiry date"}))
 
 (def key-col-names-for-send
   "Names of key columns for SEND"
@@ -590,214 +593,216 @@
           (tc/order-by #(column-name->order (:col-name %))))))
 
   (-> (->ds)
-      column-info)
-  ;; => edubasealldata20230421: descriptive-stats [139 8]:
+      column-info
+      (vary-meta assoc :print-index-range 1000))
+  ;; => edubasealldata20230817: descriptive-stats [140 8]:
   ;;    |                         :col-name |                    :csv-col-name |                                                 :col-label |          :datatype | :n-valid | :n-missing |       :min |       :max |
   ;;    |-----------------------------------|----------------------------------|------------------------------------------------------------|--------------------|---------:|-----------:|------------|------------|
-  ;;    |                              :urn |                              URN |                                                        URN |            :string |    50078 |          0 |            |            |
-  ;;    |                          :la-code |                        LA (code) |                                                  LA (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                          :la-name |                        LA (name) |                                                         LA |            :string |    50078 |          0 |            |            |
-  ;;    |             :establishment-number |              EstablishmentNumber |                                       Establishment Number |            :string |    49943 |        135 |            |            |
-  ;;    |               :establishment-name |                EstablishmentName |                                      School / College Name |            :string |    50078 |          0 |            |            |
-  ;;    |       :type-of-establishment-code |       TypeOfEstablishment (code) |                                  Establishment type (code) |             :int16 |    50078 |          0 |      1.000 |      56.00 |
-  ;;    |       :type-of-establishment-name |       TypeOfEstablishment (name) |                                         Establishment type |            :string |    50078 |          0 |            |            |
-  ;;    |    :establishment-type-group-code |    EstablishmentTypeGroup (code) |                            Establishment type group (code) |             :int16 |    50078 |          0 |      1.000 |      13.00 |
-  ;;    |    :establishment-type-group-name |    EstablishmentTypeGroup (name) |                                   Establishment type group |            :string |    50078 |          0 |            |            |
-  ;;    |        :establishment-status-code |       EstablishmentStatus (code) |                                Establishment status (code) |             :int16 |    50078 |          0 |      1.000 |      4.000 |
-  ;;    |        :establishment-status-name |       EstablishmentStatus (name) |                                       Establishment status |            :string |    50078 |          0 |            |            |
-  ;;    | :reason-establishment-opened-code | ReasonEstablishmentOpened (code) |                         Reason establishment opened (code) |             :int16 |    50078 |          0 |      0.000 |      99.00 |
-  ;;    | :reason-establishment-opened-name | ReasonEstablishmentOpened (name) |                                Reason establishment opened |            :string |    49427 |        651 |            |            |
-  ;;    |                        :open-date |                         OpenDate |                                                  Open date | :packed-local-date |    19503 |      30575 | 1800-01-01 | 2023-10-01 |
-  ;;    | :reason-establishment-closed-code | ReasonEstablishmentClosed (code) |                         Reason establishment closed (code) |             :int16 |    50078 |          0 |      0.000 |      99.00 |
-  ;;    | :reason-establishment-closed-name | ReasonEstablishmentClosed (name) |                                Reason establishment closed |            :string |    38137 |      11941 |            |            |
-  ;;    |                       :close-date |                        CloseDate |                                                 Close date | :packed-local-date |    22679 |      27399 | 1900-01-01 | 2023-09-30 |
-  ;;    |          :phase-of-education-code |          PhaseOfEducation (code) |                                  Phase of education (code) |             :int16 |    50078 |          0 |      0.000 |      7.000 |
-  ;;    |          :phase-of-education-name |          PhaseOfEducation (name) |                                         Phase of education |            :string |    50078 |          0 |            |            |
-  ;;    |                :statutory-low-age |                  StatutoryLowAge |                                            Age range (low) |             :int16 |    46115 |       3963 |      0.000 |      19.00 |
-  ;;    |               :statutory-high-age |                 StatutoryHighAge |                                           Age range (high) |             :int16 |    46118 |       3960 |      3.000 |      99.00 |
-  ;;    |                    :boarders-code |                  Boarders (code) |                                            Boarders (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |                    :boarders-name |                  Boarders (name) |                                                   Boarders |            :string |    48514 |       1564 |            |            |
-  ;;    |           :nursery-provision-name |          NurseryProvision (name) |                                          Nursery provision |            :string |    50052 |         26 |            |            |
-  ;;    |         :official-sixth-form-code |         OfficialSixthForm (code) |                                 Official sixth form (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |         :official-sixth-form-name |         OfficialSixthForm (name) |                                        Official sixth form |            :string |    50071 |          7 |            |            |
-  ;;    |                      :gender-code |                    Gender (code) |                                     Gender of entry (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |                      :gender-name |                    Gender (name) |                                            Gender of entry |            :string |    48669 |       1409 |            |            |
-  ;;    |         :religious-character-code |        ReligiousCharacter (code) |                                 Religious character (code) |             :int16 |    50078 |          0 |      0.000 |      99.00 |
-  ;;    |         :religious-character-name |        ReligiousCharacter (name) |                                        Religious character |            :string |    46459 |       3619 |            |            |
-  ;;    |             :religious-ethos-name |            ReligiousEthos (name) |                                            Religious ethos |            :string |    46817 |       3261 |            |            |
-  ;;    |                     :diocese-code |                   Diocese (code) |                                             Diocese (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                     :diocese-name |                   Diocese (name) |                                                    Diocese |            :string |    48792 |       1286 |            |            |
-  ;;    |           :admissions-policy-code |          AdmissionsPolicy (code) |                                    Admissons policy (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |           :admissions-policy-name |          AdmissionsPolicy (name) |                                           Admissons policy |            :string |    44963 |       5115 |            |            |
-  ;;    |                  :school-capacity |                   SchoolCapacity |                                            School capacity |             :int16 |    37792 |      12286 |      1.000 |  1.000E+04 |
-  ;;    |             :special-classes-code |            SpecialClasses (code) |                                     Special classes (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |             :special-classes-name |            SpecialClasses (name) |                                            Special classes |            :string |    49962 |        116 |            |            |
-  ;;    |                      :census-date |                       CensusDate |                                                Census date | :packed-local-date |    28560 |      21518 | 2017-01-19 | 2022-01-20 |
-  ;;    |                 :number-of-pupils |                   NumberOfPupils |                                           Number of pupils |             :int16 |    28557 |      21521 |      0.000 |       3442 |
-  ;;    |                   :number-of-boys |                     NumberOfBoys |                                             Number of boys |             :int16 |    28547 |      21531 |      0.000 |       1773 |
-  ;;    |                  :number-of-girls |                    NumberOfGirls |                                            Number of girls |             :int16 |    28542 |      21536 |      0.000 |       1871 |
-  ;;    |                   :percentage-fsm |                    PercentageFSM |                                             Percentage FSM |           :float64 |    28352 |      21726 |      0.000 |      100.0 |
-  ;;    |           :trust-school-flag-code |           TrustSchoolFlag (code) |                                   Trust school flag (code) |             :int16 |    50078 |          0 |      0.000 |      5.000 |
-  ;;    |           :trust-school-flag-name |           TrustSchoolFlag (name) |                                          Trust school flag |            :string |    50078 |          0 |            |            |
-  ;;    |                      :trusts-code |                    Trusts (code) |                              Academy trust or trust (code) |             :int16 |    10842 |      39236 |       1028 |  1.766E+04 |
-  ;;    |                      :trusts-name |                    Trusts (name) |                                     Academy trust or trust |            :string |    10842 |      39236 |            |            |
-  ;;    |         :school-sponsor-flag-name |         SchoolSponsorFlag (name) |                                        School sponsor flag |            :string |    50078 |          0 |            |            |
-  ;;    |             :school-sponsors-name |            SchoolSponsors (name) |                                            Academy sponsor |            :string |     7741 |      42337 |            |            |
-  ;;    |             :federation-flag-name |            FederationFlag (name) |                                            Federation flag |            :string |    50078 |          0 |            |            |
-  ;;    |                 :federations-code |               Federations (code) |                                          Federation (code) |            :string |     1114 |      48964 |            |            |
-  ;;    |                 :federations-name |               Federations (name) |                                                 Federation |            :string |     1114 |      48964 |            |            |
-  ;;    |                            :ukprn |                            UKPRN |                       UK provider reference number (UKPRN) |            :string |    31650 |      18428 |            |            |
-  ;;    |                  :fehe-identifier |                   FEHEIdentifier |                                            FEHE identifier |            :string |      537 |      49541 |            |            |
-  ;;    |      :further-education-type-name |      FurtherEducationType (name) |                                     Further education type |            :string |    46317 |       3761 |            |            |
-  ;;    |                 :ofsted-last-insp |                   OfstedLastInsp |                             Date of last OFSTED inspection | :packed-local-date |    26420 |      23658 | 2006-05-12 | 2023-01-18 |
-  ;;    |     :ofsted-special-measures-code |     OfstedSpecialMeasures (code) |                             OFSTED special measures (code) |             :int16 |    50078 |          0 |      0.000 |      0.000 |
-  ;;    |     :ofsted-special-measures-name |     OfstedSpecialMeasures (name) |                                    OFSTED special measures |            :string |    50078 |          0 |            |            |
-  ;;    |                :last-changed-date |                  LastChangedDate |                                          Last Changed Date | :packed-local-date |    50078 |          0 | 2013-10-24 | 2023-04-21 |
-  ;;    |                           :street |                           Street |                                                     Street |            :string |    48889 |       1189 |            |            |
-  ;;    |                         :locality |                         Locality |                                                   Locality |            :string |    27174 |      22904 |            |            |
-  ;;    |                         :address3 |                         Address3 |                                                  Address 3 |            :string |     3972 |      46106 |            |            |
-  ;;    |                             :town |                             Town |                                                       Town |            :string |    48074 |       2004 |            |            |
-  ;;    |                      :county-name |                    County (name) |                                                     County |            :string |    38552 |      11526 |            |            |
-  ;;    |                         :postcode |                         Postcode |                                                   Postcode |            :string |    48690 |       1388 |            |            |
-  ;;    |                   :school-website |                    SchoolWebsite |                                                    Website |            :string |    24485 |      25593 |            |            |
-  ;;    |                    :telephone-num |                     TelephoneNum |                                                  Telephone |            :string |    27218 |      22860 |            |            |
-  ;;    |                  :head-title-name |                 HeadTitle (name) |                                Headteacher/Principal title |            :string |    41092 |       8986 |            |            |
-  ;;    |                  :head-first-name |                    HeadFirstName |                           Headteacher/Principal first name |            :string |    42425 |       7653 |            |            |
-  ;;    |                   :head-last-name |                     HeadLastName |                            Headteacher/Principal last name |            :string |    42483 |       7595 |            |            |
-  ;;    |         :head-preferred-job-title |            HeadPreferredJobTitle |                  Headteacher/Principal preferred job title |            :string |    44462 |       5616 |            |            |
-  ;;    |       :bso-inspectorate-name-name |       BSOInspectorateName (name) |                                      BSO inspectorate name |            :string |    50078 |          0 |            |            |
-  ;;    |              :inspectorate-report |               InspectorateReport |                                    Inspectorate report URL |            :string |      222 |      49856 |            |            |
-  ;;    |    :date-of-last-inspection-visit |        DateOfLastInspectionVisit |                              Date of last inspection visit | :packed-local-date |      223 |      49855 | 2016-03-03 | 2023-02-16 |
-  ;;    |            :next-inspection-visit |              NextInspectionVisit |                              Date of next inspection visit | :packed-local-date |        0 |      50078 | 1970-01-01 | 1970-01-01 |
-  ;;    |                   :teen-moth-name |                  TeenMoth (name) |                                            Teenage mothers |            :string |    50070 |          8 |            |            |
-  ;;    |                 :teen-moth-places |                   TeenMothPlaces |                                   Teenage mothers capacity |             :int16 |       99 |      49979 |      0.000 |      45.00 |
-  ;;    |                         :ccf-name |                       CCF (name) |                                      Child care facilities |            :string |    44555 |       5523 |            |            |
-  ;;    |                      :senpru-name |                    SENPRU (name) |                                      PRU provision for SEN |            :string |    50067 |         11 |            |            |
-  ;;    |                         :ebd-name |                       EBD (name) |                                      PRU provision for EBD |            :string |    50071 |          7 |            |            |
-  ;;    |                       :places-pru |                        PlacesPRU |                                       Number of PRU places |             :int16 |      602 |      49476 |      0.000 |      300.0 |
-  ;;    |                     :ft-prov-name |                    FTProv (name) |                              PRU offer full time provision |            :string |     1654 |      48424 |            |            |
-  ;;    |                 :ed-by-other-name |                 EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44544 |       5534 |            |            |
-  ;;    |          :section41-approved-name |         Section41Approved (name) |                                        Section 41 approved |            :string |    50078 |          0 |            |            |
-  ;;    |                        :sen1-name |                      SEN1 (name) |                                                 SEN need 1 |            :string |     5569 |      44509 |            |            |
-  ;;    |                        :sen2-name |                      SEN2 (name) |                                                 SEN need 2 |            :string |     1950 |      48128 |            |            |
-  ;;    |                        :sen3-name |                      SEN3 (name) |                                                 SEN need 3 |            :string |     1164 |      48914 |            |            |
-  ;;    |                        :sen4-name |                      SEN4 (name) |                                                 SEN need 4 |            :string |      810 |      49268 |            |            |
-  ;;    |                        :sen5-name |                      SEN5 (name) |                                                 SEN need 5 |            :string |      586 |      49492 |            |            |
-  ;;    |                        :sen6-name |                      SEN6 (name) |                                                 SEN need 6 |            :string |      508 |      49570 |            |            |
-  ;;    |                        :sen7-name |                      SEN7 (name) |                                                 SEN need 7 |            :string |      451 |      49627 |            |            |
-  ;;    |                        :sen8-name |                      SEN8 (name) |                                                 SEN need 8 |            :string |      378 |      49700 |            |            |
-  ;;    |                        :sen9-name |                      SEN9 (name) |                                                 SEN need 9 |            :string |      297 |      49781 |            |            |
-  ;;    |                       :sen10-name |                     SEN10 (name) |                                                SEN need 10 |            :string |      203 |      49875 |            |            |
-  ;;    |                       :sen11-name |                     SEN11 (name) |                                                SEN need 11 |            :string |      140 |      49938 |            |            |
-  ;;    |                       :sen12-name |                     SEN12 (name) |                                                SEN need 12 |            :string |       95 |      49983 |            |            |
-  ;;    |                       :sen13-name |                     SEN13 (name) |                                                SEN need 13 |            :string |        7 |      50071 |            |            |
-  ;;    | :type-of-resourced-provision-name |  TypeOfResourcedProvision (name) |                                Type of resourced provision |            :string |     6904 |      43174 |            |            |
-  ;;    |      :resourced-provision-on-roll |         ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1870 |      48208 |      0.000 |       1872 |
-  ;;    |     :resourced-provision-capacity |       ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1903 |      48175 |      0.000 |       1250 |
-  ;;    |                 :sen-unit-on-roll |                    SenUnitOnRoll |                                    SEN unit number on roll |             :int16 |      853 |      49225 |      0.000 |      427.0 |
-  ;;    |                :sen-unit-capacity |                  SenUnitCapacity |                                          SEN unit capacity |             :int16 |      872 |      49206 |      0.000 |      427.0 |
-  ;;    |                         :gor-code |                       GOR (code) |                                                 GOR (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                         :gor-name |                       GOR (name) |                                                        GOR |            :string |    50078 |          0 |            |            |
-  ;;    |     :district-administrative-code |    DistrictAdministrative (code) |                             District administrative (code) |            :string |    50078 |          0 |            |            |
-  ;;    |     :district-administrative-name |    DistrictAdministrative (name) |                                    District administrative |            :string |    47649 |       2429 |            |            |
-  ;;    |         :administrative-ward-code |        AdministrativeWard (code) |                                 Administrative ward (code) |            :string |    50078 |          0 |            |            |
-  ;;    |         :administrative-ward-name |        AdministrativeWard (name) |                                        Administrative ward |            :string |    48691 |       1387 |            |            |
-  ;;    |  :parliamentary-constituency-code | ParliamentaryConstituency (code) |                          Parliamentary constituency (code) |            :string |    50078 |          0 |            |            |
-  ;;    |  :parliamentary-constituency-name | ParliamentaryConstituency (name) |                                 Parliamentary constituency |            :string |    48691 |       1387 |            |            |
-  ;;    |                 :urban-rural-code |                UrbanRural (code) |                                         Urban rural (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                 :urban-rural-name |                UrbanRural (name) |                                                Urban rural |            :string |    48690 |       1388 |            |            |
-  ;;    |                  :gssla-code-name |                 GSSLACode (name) |                                                 GSSLA code |            :string |    50078 |          0 |            |            |
-  ;;    |                          :easting |                          Easting |                                                    Easting |             :int32 |    48474 |       1604 |      0.000 |  6.551E+05 |
-  ;;    |                         :northing |                         Northing |                                                   Northing |             :int32 |    48474 |       1604 |      0.000 |  8.119E+05 |
-  ;;    |                        :msoa-name |                      MSOA (name) |                                                       MSOA |            :string |    48691 |       1387 |            |            |
-  ;;    |                        :lsoa-name |                      LSOA (name) |                                                       LSOA |            :string |    48690 |       1388 |            |            |
-  ;;    |           :inspectorate-name-name |          InspectorateName (name) |                                          Inspectorate name |            :string |     4492 |      45586 |            |            |
-  ;;    |                         :sen-stat |                          SENStat |     Number of special pupils under a SEN statement or EHCP |             :int16 |     3636 |      46442 |      0.000 |      311.0 |
-  ;;    |                      :sen-no-stat |                        SENNoStat | Number of special pupils not under a SEN statement or EHCP |             :int16 |     3501 |      46577 |      0.000 |      485.0 |
-  ;;    |      :boarding-establishment-name |     BoardingEstablishment (name) |                                     Boarding establishment |            :string |     2607 |      47471 |            |            |
-  ;;    |                       :props-name |                        PropsName |                                          Proprietor's name |            :string |     3105 |      46973 |            |            |
-  ;;    |                 :previous-la-code |                PreviousLA (code) |                            Previous local authority (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                 :previous-la-name |                PreviousLA (name) |                                   Previous local authority |            :string |    16522 |      33556 |            |            |
-  ;;    |    :previous-establishment-number |      PreviousEstablishmentNumber |                              Previous establishment number |            :string |     8014 |      42064 |            |            |
-  ;;    |               :ofsted-rating-name |              OfstedRating (name) |                                              OFSTED rating |            :string |    26367 |      23711 |            |            |
-  ;;    |                  :rsc-region-name |                 RSCRegion (name) |                                                 RSC region |            :string |    47147 |       2931 |            |            |
-  ;;    |                     :country-name |                   Country (name) |                                                    Country |            :string |     2523 |      47555 |            |            |
-  ;;    |                             :uprn |                             UPRN |                                                       UPRN |            :string |    37411 |      12667 |            |            |
-  ;;    |                        :site-name |                         SiteName |                                                  Site name |            :string |        3 |      50075 |            |            |
-  ;;    |                    :qab-name-code |                   QABName (code) |                                            QAB name (code) |             :int16 |    50078 |          0 |      0.000 |      1.000 |
-  ;;    |                    :qab-name-name |                   QABName (name) |                                                   QAB name |            :string |    50078 |          0 |            |            |
-  ;;    |    :establishment-accredited-code |   EstablishmentAccredited (code) |                            Establishment accredited (code) |             :int16 |    50078 |          0 |      0.000 |      2.000 |
-  ;;    |    :establishment-accredited-name |   EstablishmentAccredited (name) |                                   Establishment accredited |            :string |    50078 |          0 |            |            |
-  ;;    |                       :qab-report |                        QABReport |                                                 QAB report |            :string |        0 |      50078 |            |            |
-  ;;    |                        :ch-number |                         CHNumber |                                                  CH number |            :string |        0 |      50078 |            |            |
-  ;;    |                        :msoa-code |                      MSOA (code) |                                                MSOA (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                        :lsoa-code |                      LSOA (code) |                                                LSOA (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                              :fsm |                              FSM |                                                        FSM |             :int16 |    28353 |      21725 |      0.000 |      849.0 |
+  ;;    |                              :urn |                              URN |                                                        URN |            :string |    50294 |          0 |            |            |
+  ;;    |                          :la-code |                        LA (code) |                                                  LA (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                          :la-name |                        LA (name) |                                                         LA |            :string |    50294 |          0 |            |            |
+  ;;    |             :establishment-number |              EstablishmentNumber |                                       Establishment Number |            :string |    50159 |        135 |            |            |
+  ;;    |               :establishment-name |                EstablishmentName |                                      School / College Name |            :string |    50294 |          0 |            |            |
+  ;;    |       :type-of-establishment-code |       TypeOfEstablishment (code) |                                  Establishment type (code) |             :int16 |    50294 |          0 |      1.000 |      56.00 |
+  ;;    |       :type-of-establishment-name |       TypeOfEstablishment (name) |                                         Establishment type |            :string |    50294 |          0 |            |            |
+  ;;    |    :establishment-type-group-code |    EstablishmentTypeGroup (code) |                            Establishment type group (code) |             :int16 |    50294 |          0 |      1.000 |      11.00 |
+  ;;    |    :establishment-type-group-name |    EstablishmentTypeGroup (name) |                                   Establishment type group |            :string |    50294 |          0 |            |            |
+  ;;    |        :establishment-status-code |       EstablishmentStatus (code) |                                Establishment status (code) |             :int16 |    50294 |          0 |      1.000 |      4.000 |
+  ;;    |        :establishment-status-name |       EstablishmentStatus (name) |                                       Establishment status |            :string |    50294 |          0 |            |            |
+  ;;    | :reason-establishment-opened-code | ReasonEstablishmentOpened (code) |                         Reason establishment opened (code) |             :int16 |    50294 |          0 |      0.000 |      99.00 |
+  ;;    | :reason-establishment-opened-name | ReasonEstablishmentOpened (name) |                                Reason establishment opened |            :string |    49612 |        682 |            |            |
+  ;;    |                        :open-date |                         OpenDate |                                                  Open date | :packed-local-date |    19781 |      30513 | 1800-01-01 | 2024-01-01 |
+  ;;    | :reason-establishment-closed-code | ReasonEstablishmentClosed (code) |                         Reason establishment closed (code) |             :int16 |    50294 |          0 |      0.000 |      99.00 |
+  ;;    | :reason-establishment-closed-name | ReasonEstablishmentClosed (name) |                                Reason establishment closed |            :string |    38028 |      12266 |            |            |
+  ;;    |                       :close-date |                        CloseDate |                                                 Close date | :packed-local-date |    22874 |      27420 | 1900-01-01 | 2026-08-31 |
+  ;;    |          :phase-of-education-code |          PhaseOfEducation (code) |                                  Phase of education (code) |             :int16 |    50294 |          0 |      0.000 |      7.000 |
+  ;;    |          :phase-of-education-name |          PhaseOfEducation (name) |                                         Phase of education |            :string |    50294 |          0 |            |            |
+  ;;    |                :statutory-low-age |                  StatutoryLowAge |                                            Age range (low) |             :int16 |    46332 |       3962 |      0.000 |      19.00 |
+  ;;    |               :statutory-high-age |                 StatutoryHighAge |                                           Age range (high) |             :int16 |    46335 |       3959 |      3.000 |      99.00 |
+  ;;    |                    :boarders-code |                  Boarders (code) |                                            Boarders (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |                    :boarders-name |                  Boarders (name) |                                                   Boarders |            :string |    48683 |       1611 |            |            |
+  ;;    |           :nursery-provision-name |          NurseryProvision (name) |                                          Nursery provision |            :string |    50268 |         26 |            |            |
+  ;;    |         :official-sixth-form-code |         OfficialSixthForm (code) |                                 Official sixth form (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |         :official-sixth-form-name |         OfficialSixthForm (name) |                                        Official sixth form |            :string |    50287 |          7 |            |            |
+  ;;    |                      :gender-code |                    Gender (code) |                                     Gender of entry (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |                      :gender-name |                    Gender (name) |                                            Gender of entry |            :string |    48885 |       1409 |            |            |
+  ;;    |         :religious-character-code |        ReligiousCharacter (code) |                                 Religious character (code) |             :int16 |    50294 |          0 |      0.000 |      99.00 |
+  ;;    |         :religious-character-name |        ReligiousCharacter (name) |                                        Religious character |            :string |    46620 |       3674 |            |            |
+  ;;    |             :religious-ethos-name |            ReligiousEthos (name) |                                            Religious ethos |            :string |    47029 |       3265 |            |            |
+  ;;    |                     :diocese-code |                   Diocese (code) |                                             Diocese (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                     :diocese-name |                   Diocese (name) |                                                    Diocese |            :string |    48990 |       1304 |            |            |
+  ;;    |           :admissions-policy-code |          AdmissionsPolicy (code) |                                    Admissons policy (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |           :admissions-policy-name |          AdmissionsPolicy (name) |                                           Admissons policy |            :string |    45105 |       5189 |            |            |
+  ;;    |                  :school-capacity |                   SchoolCapacity |                                            School capacity |             :int16 |    37979 |      12315 |      1.000 |  1.000E+04 |
+  ;;    |             :special-classes-code |            SpecialClasses (code) |                                     Special classes (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |             :special-classes-name |            SpecialClasses (name) |                                            Special classes |            :string |    50173 |        121 |            |            |
+  ;;    |                      :census-date |                       CensusDate |                                                Census date | :packed-local-date |    28560 |      21734 | 2017-01-19 | 2022-01-20 |
+  ;;    |                 :number-of-pupils |                   NumberOfPupils |                                           Number of pupils |             :int16 |    28560 |      21734 |      0.000 |       3442 |
+  ;;    |                   :number-of-boys |                     NumberOfBoys |                                             Number of boys |             :int16 |    28547 |      21747 |      0.000 |       1773 |
+  ;;    |                  :number-of-girls |                    NumberOfGirls |                                            Number of girls |             :int16 |    28542 |      21752 |      0.000 |       1871 |
+  ;;    |                   :percentage-fsm |                    PercentageFSM |                                             Percentage FSM |           :float64 |    28352 |      21942 |      0.000 |      100.0 |
+  ;;    |           :trust-school-flag-code |           TrustSchoolFlag (code) |                                   Trust school flag (code) |             :int16 |    50294 |          0 |      0.000 |      5.000 |
+  ;;    |           :trust-school-flag-name |           TrustSchoolFlag (name) |                                          Trust school flag |            :string |    50294 |          0 |            |            |
+  ;;    |                      :trusts-code |                    Trusts (code) |                              Academy trust or trust (code) |             :int16 |    10900 |      39394 |       1028 |  1.766E+04 |
+  ;;    |                      :trusts-name |                    Trusts (name) |                                     Academy trust or trust |            :string |    10900 |      39394 |            |            |
+  ;;    |         :school-sponsor-flag-name |         SchoolSponsorFlag (name) |                                        School sponsor flag |            :string |    50294 |          0 |            |            |
+  ;;    |             :school-sponsors-name |            SchoolSponsors (name) |                                            Academy sponsor |            :string |     7861 |      42433 |            |            |
+  ;;    |             :federation-flag-name |            FederationFlag (name) |                                            Federation flag |            :string |    50294 |          0 |            |            |
+  ;;    |                 :federations-code |               Federations (code) |                                          Federation (code) |            :string |     1128 |      49166 |            |            |
+  ;;    |                 :federations-name |               Federations (name) |                                                 Federation |            :string |     1128 |      49166 |            |            |
+  ;;    |                            :ukprn |                            UKPRN |                       UK provider reference number (UKPRN) |            :string |    31800 |      18494 |            |            |
+  ;;    |                  :fehe-identifier |                   FEHEIdentifier |                                            FEHE identifier |            :string |      537 |      49757 |            |            |
+  ;;    |      :further-education-type-name |      FurtherEducationType (name) |                                     Further education type |            :string |    46315 |       3979 |            |            |
+  ;;    |                 :ofsted-last-insp |                   OfstedLastInsp |                             Date of last OFSTED inspection | :packed-local-date |    26967 |      23327 | 2006-05-12 | 2023-05-25 |
+  ;;    |     :ofsted-special-measures-code |     OfstedSpecialMeasures (code) |                             OFSTED special measures (code) |             :int16 |    50294 |          0 |      0.000 |      0.000 |
+  ;;    |     :ofsted-special-measures-name |     OfstedSpecialMeasures (name) |                                    OFSTED special measures |            :string |    50294 |          0 |            |            |
+  ;;    |                :last-changed-date |                  LastChangedDate |                                          Last Changed Date | :packed-local-date |    50294 |          0 | 2013-10-24 | 2023-08-16 |
+  ;;    |                           :street |                           Street |                                                     Street |            :string |    49100 |       1194 |            |            |
+  ;;    |                         :locality |                         Locality |                                                   Locality |            :string |    27266 |      23028 |            |            |
+  ;;    |                         :address3 |                         Address3 |                                                  Address 3 |            :string |     3989 |      46305 |            |            |
+  ;;    |                             :town |                             Town |                                                       Town |            :string |    48291 |       2003 |            |            |
+  ;;    |                      :county-name |                    County (name) |                                                     County |            :string |    38716 |      11578 |            |            |
+  ;;    |                         :postcode |                         Postcode |                                                   Postcode |            :string |    48876 |       1418 |            |            |
+  ;;    |                   :school-website |                    SchoolWebsite |                                                    Website |            :string |    24530 |      25764 |            |            |
+  ;;    |                    :telephone-num |                     TelephoneNum |                                                  Telephone |            :string |    27246 |      23048 |            |            |
+  ;;    |                  :head-title-name |                 HeadTitle (name) |                                Headteacher/Principal title |            :string |    41284 |       9010 |            |            |
+  ;;    |                  :head-first-name |                    HeadFirstName |                           Headteacher/Principal first name |            :string |    42643 |       7651 |            |            |
+  ;;    |                   :head-last-name |                     HeadLastName |                            Headteacher/Principal last name |            :string |    42701 |       7593 |            |            |
+  ;;    |         :head-preferred-job-title |            HeadPreferredJobTitle |                  Headteacher/Principal preferred job title |            :string |    44518 |       5776 |            |            |
+  ;;    |       :bso-inspectorate-name-name |       BSOInspectorateName (name) |                                      BSO inspectorate name |            :string |    50294 |          0 |            |            |
+  ;;    |              :inspectorate-report |               InspectorateReport |                                    Inspectorate report URL |            :string |      248 |      50046 |            |            |
+  ;;    |    :date-of-last-inspection-visit |        DateOfLastInspectionVisit |                              Date of last inspection visit | :packed-local-date |      250 |      50044 | 2016-03-03 | 2023-06-12 |
+  ;;    |            :next-inspection-visit |              NextInspectionVisit |                              Date of next inspection visit | :packed-local-date |        0 |      50294 | 1970-01-01 | 1970-01-01 |
+  ;;    |                   :teen-moth-name |                  TeenMoth (name) |                                            Teenage mothers |            :string |    50286 |          8 |            |            |
+  ;;    |                 :teen-moth-places |                   TeenMothPlaces |                                   Teenage mothers capacity |             :int16 |       99 |      50195 |      0.000 |      45.00 |
+  ;;    |                         :ccf-name |                       CCF (name) |                                      Child care facilities |            :string |    44613 |       5681 |            |            |
+  ;;    |                      :senpru-name |                    SENPRU (name) |                                      PRU provision for SEN |            :string |    50283 |         11 |            |            |
+  ;;    |                         :ebd-name |                       EBD (name) |                                      PRU provision for EBD |            :string |    50287 |          7 |            |            |
+  ;;    |                       :places-pru |                        PlacesPRU |                                       Number of PRU places |             :int16 |      602 |      49692 |      0.000 |      300.0 |
+  ;;    |                     :ft-prov-name |                    FTProv (name) |                              PRU offer full time provision |            :string |     1714 |      48580 |            |            |
+  ;;    |                 :ed-by-other-name |                 EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44602 |       5692 |            |            |
+  ;;    |          :section41-approved-name |         Section41Approved (name) |                                        Section 41 approved |            :string |    50294 |          0 |            |            |
+  ;;    |                        :sen1-name |                      SEN1 (name) |                                                 SEN need 1 |            :string |     5582 |      44712 |            |            |
+  ;;    |                        :sen2-name |                      SEN2 (name) |                                                 SEN need 2 |            :string |     1960 |      48334 |            |            |
+  ;;    |                        :sen3-name |                      SEN3 (name) |                                                 SEN need 3 |            :string |     1171 |      49123 |            |            |
+  ;;    |                        :sen4-name |                      SEN4 (name) |                                                 SEN need 4 |            :string |      813 |      49481 |            |            |
+  ;;    |                        :sen5-name |                      SEN5 (name) |                                                 SEN need 5 |            :string |      588 |      49706 |            |            |
+  ;;    |                        :sen6-name |                      SEN6 (name) |                                                 SEN need 6 |            :string |      511 |      49783 |            |            |
+  ;;    |                        :sen7-name |                      SEN7 (name) |                                                 SEN need 7 |            :string |      455 |      49839 |            |            |
+  ;;    |                        :sen8-name |                      SEN8 (name) |                                                 SEN need 8 |            :string |      383 |      49911 |            |            |
+  ;;    |                        :sen9-name |                      SEN9 (name) |                                                 SEN need 9 |            :string |      301 |      49993 |            |            |
+  ;;    |                       :sen10-name |                     SEN10 (name) |                                                SEN need 10 |            :string |      205 |      50089 |            |            |
+  ;;    |                       :sen11-name |                     SEN11 (name) |                                                SEN need 11 |            :string |      142 |      50152 |            |            |
+  ;;    |                       :sen12-name |                     SEN12 (name) |                                                SEN need 12 |            :string |       97 |      50197 |            |            |
+  ;;    |                       :sen13-name |                     SEN13 (name) |                                                SEN need 13 |            :string |        5 |      50289 |            |            |
+  ;;    | :type-of-resourced-provision-name |  TypeOfResourcedProvision (name) |                                Type of resourced provision |            :string |     6986 |      43308 |            |            |
+  ;;    |      :resourced-provision-on-roll |         ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1887 |      48407 |      0.000 |       1872 |
+  ;;    |     :resourced-provision-capacity |       ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1920 |      48374 |      0.000 |       1250 |
+  ;;    |                 :sen-unit-on-roll |                    SenUnitOnRoll |                                    SEN unit number on roll |             :int16 |      866 |      49428 |      0.000 |      427.0 |
+  ;;    |                :sen-unit-capacity |                  SenUnitCapacity |                                          SEN unit capacity |             :int16 |      885 |      49409 |      0.000 |      427.0 |
+  ;;    |                         :gor-code |                       GOR (code) |                                                 GOR (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                         :gor-name |                       GOR (name) |                                                        GOR |            :string |    50294 |          0 |            |            |
+  ;;    |     :district-administrative-code |    DistrictAdministrative (code) |                             District administrative (code) |            :string |    50294 |          0 |            |            |
+  ;;    |     :district-administrative-name |    DistrictAdministrative (name) |                                    District administrative |            :string |    48872 |       1422 |            |            |
+  ;;    |         :administrative-ward-code |        AdministrativeWard (code) |                                 Administrative ward (code) |            :string |    50294 |          0 |            |            |
+  ;;    |         :administrative-ward-name |        AdministrativeWard (name) |                                        Administrative ward |            :string |    48873 |       1421 |            |            |
+  ;;    |  :parliamentary-constituency-code | ParliamentaryConstituency (code) |                          Parliamentary constituency (code) |            :string |    50294 |          0 |            |            |
+  ;;    |  :parliamentary-constituency-name | ParliamentaryConstituency (name) |                                 Parliamentary constituency |            :string |    48873 |       1421 |            |            |
+  ;;    |                 :urban-rural-code |                UrbanRural (code) |                                         Urban rural (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                 :urban-rural-name |                UrbanRural (name) |                                                Urban rural |            :string |    48872 |       1422 |            |            |
+  ;;    |                  :gssla-code-name |                 GSSLACode (name) |                                                 GSSLA code |            :string |    50294 |          0 |            |            |
+  ;;    |                          :easting |                          Easting |                                                    Easting |             :int32 |    48592 |       1702 |      0.000 |  6.551E+05 |
+  ;;    |                         :northing |                         Northing |                                                   Northing |             :int32 |    48592 |       1702 |      0.000 |  8.119E+05 |
+  ;;    |                        :msoa-name |                      MSOA (name) |                                                       MSOA |            :string |    48873 |       1421 |            |            |
+  ;;    |                        :lsoa-name |                      LSOA (name) |                                                       LSOA |            :string |    48872 |       1422 |            |            |
+  ;;    |           :inspectorate-name-name |          InspectorateName (name) |                                          Inspectorate name |            :string |     4582 |      45712 |            |            |
+  ;;    |                         :sen-stat |                          SENStat |     Number of special pupils under a SEN statement or EHCP |             :int16 |     3650 |      46644 |      0.000 |      311.0 |
+  ;;    |                      :sen-no-stat |                        SENNoStat | Number of special pupils not under a SEN statement or EHCP |             :int16 |     3506 |      46788 |      0.000 |      485.0 |
+  ;;    |      :boarding-establishment-name |     BoardingEstablishment (name) |                                     Boarding establishment |            :string |     2608 |      47686 |            |            |
+  ;;    |                       :props-name |                        PropsName |                                          Proprietor's name |            :string |     3174 |      47120 |            |            |
+  ;;    |                 :previous-la-code |                PreviousLA (code) |                            Previous local authority (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                 :previous-la-name |                PreviousLA (name) |                                   Previous local authority |            :string |    16549 |      33745 |            |            |
+  ;;    |    :previous-establishment-number |      PreviousEstablishmentNumber |                              Previous establishment number |            :string |     8027 |      42267 |            |            |
+  ;;    |               :ofsted-rating-name |              OfstedRating (name) |                                              OFSTED rating |            :string |    26908 |      23386 |            |            |
+  ;;    |                  :rsc-region-name |                 RSCRegion (name) |                                                 RSC region |            :string |    47332 |       2962 |            |            |
+  ;;    |                     :country-name |                   Country (name) |                                                    Country |            :string |     2702 |      47592 |            |            |
+  ;;    |                             :uprn |                             UPRN |                                                       UPRN |            :string |    37600 |      12694 |            |            |
+  ;;    |                        :site-name |                         SiteName |                                                  Site name |            :string |        3 |      50291 |            |            |
+  ;;    |                    :qab-name-code |                   QABName (code) |                                            QAB name (code) |             :int16 |    50294 |          0 |      0.000 |      0.000 |
+  ;;    |                    :qab-name-name |                   QABName (name) |                                                   QAB name |            :string |    50294 |          0 |            |            |
+  ;;    |    :establishment-accredited-code |   EstablishmentAccredited (code) |                            Establishment accredited (code) |             :int16 |    50294 |          0 |      0.000 |      0.000 |
+  ;;    |    :establishment-accredited-name |   EstablishmentAccredited (name) |                                   Establishment accredited |            :string |    50294 |          0 |            |            |
+  ;;    |                       :qab-report |                        QABReport |                                                 QAB report |            :string |        0 |      50294 |            |            |
+  ;;    |                        :ch-number |                         CHNumber |                                                  CH number |            :string |        0 |      50294 |            |            |
+  ;;    |                        :msoa-code |                      MSOA (code) |                                                MSOA (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                        :lsoa-code |                      LSOA (code) |                                                LSOA (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                              :fsm |                              FSM |                                                        FSM |             :int16 |    28353 |      21941 |      0.000 |      849.0 |
+  ;;    |        :accreditation-expiry-date |          AccreditationExpiryDate |                                  Accreditation expiry date |           :boolean |        0 |      50294 |            |            |
 
   (-> (->ds {:dataset-name "GIAS establishments"})
       tc/dataset-name)
   ;; => "GIAS establishments"
 
   (-> (key-cols-for-send->ds)
-      column-info)
-  ;; => edubasealldata20230421 - key columns for SEND: descriptive-stats [54 8]:
+      column-info
+      (vary-meta assoc :print-index-range 1000))
+  ;; => edubasealldata20230817 - key columns for SEND: descriptive-stats [54 8]:
   ;;    |                         :col-name |                   :csv-col-name |                                                 :col-label |          :datatype | :n-valid | :n-missing |       :min |       :max |
   ;;    |-----------------------------------|---------------------------------|------------------------------------------------------------|--------------------|---------:|-----------:|------------|------------|
-  ;;    |                              :urn |                             URN |                                                        URN |            :string |    50078 |          0 |            |            |
-  ;;    |                          :la-code |                       LA (code) |                                                  LA (code) |            :string |    50078 |          0 |            |            |
-  ;;    |                          :la-name |                       LA (name) |                                                         LA |            :string |    50078 |          0 |            |            |
-  ;;    |             :establishment-number |             EstablishmentNumber |                                       Establishment Number |            :string |    49943 |        135 |            |            |
-  ;;    |               :establishment-name |               EstablishmentName |                                      School / College Name |            :string |    50078 |          0 |            |            |
-  ;;    |       :type-of-establishment-code |      TypeOfEstablishment (code) |                                  Establishment type (code) |             :int16 |    50078 |          0 |      1.000 |      56.00 |
-  ;;    |       :type-of-establishment-name |      TypeOfEstablishment (name) |                                         Establishment type |            :string |    50078 |          0 |            |            |
-  ;;    |    :establishment-type-group-code |   EstablishmentTypeGroup (code) |                            Establishment type group (code) |             :int16 |    50078 |          0 |      1.000 |      13.00 |
-  ;;    |    :establishment-type-group-name |   EstablishmentTypeGroup (name) |                                   Establishment type group |            :string |    50078 |          0 |            |            |
-  ;;    |        :establishment-status-code |      EstablishmentStatus (code) |                                Establishment status (code) |             :int16 |    50078 |          0 |      1.000 |      4.000 |
-  ;;    |        :establishment-status-name |      EstablishmentStatus (name) |                                       Establishment status |            :string |    50078 |          0 |            |            |
-  ;;    |                        :open-date |                        OpenDate |                                                  Open date | :packed-local-date |    19503 |      30575 | 1800-01-01 | 2023-10-01 |
-  ;;    |                       :close-date |                       CloseDate |                                                 Close date | :packed-local-date |    22679 |      27399 | 1900-01-01 | 2023-09-30 |
-  ;;    |          :phase-of-education-code |         PhaseOfEducation (code) |                                  Phase of education (code) |             :int16 |    50078 |          0 |      0.000 |      7.000 |
-  ;;    |          :phase-of-education-name |         PhaseOfEducation (name) |                                         Phase of education |            :string |    50078 |          0 |            |            |
-  ;;    |                :statutory-low-age |                 StatutoryLowAge |                                            Age range (low) |             :int16 |    46115 |       3963 |      0.000 |      19.00 |
-  ;;    |               :statutory-high-age |                StatutoryHighAge |                                           Age range (high) |             :int16 |    46118 |       3960 |      3.000 |      99.00 |
-  ;;    |           :nursery-provision-name |         NurseryProvision (name) |                                          Nursery provision |            :string |    50052 |         26 |            |            |
-  ;;    |         :official-sixth-form-code |        OfficialSixthForm (code) |                                 Official sixth form (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |         :official-sixth-form-name |        OfficialSixthForm (name) |                                        Official sixth form |            :string |    50071 |          7 |            |            |
-  ;;    |                  :school-capacity |                  SchoolCapacity |                                            School capacity |             :int16 |    37792 |      12286 |      1.000 |  1.000E+04 |
-  ;;    |             :special-classes-code |           SpecialClasses (code) |                                     Special classes (code) |             :int16 |    50078 |          0 |      0.000 |      9.000 |
-  ;;    |             :special-classes-name |           SpecialClasses (name) |                                            Special classes |            :string |    49962 |        116 |            |            |
-  ;;    |                 :number-of-pupils |                  NumberOfPupils |                                           Number of pupils |             :int16 |    28557 |      21521 |      0.000 |       3442 |
-  ;;    |                            :ukprn |                           UKPRN |                       UK provider reference number (UKPRN) |            :string |    31650 |      18428 |            |            |
-  ;;    |      :further-education-type-name |     FurtherEducationType (name) |                                     Further education type |            :string |    46317 |       3761 |            |            |
-  ;;    |                   :school-website |                   SchoolWebsite |                                                    Website |            :string |    24485 |      25593 |            |            |
-  ;;    |                      :senpru-name |                   SENPRU (name) |                                      PRU provision for SEN |            :string |    50067 |         11 |            |            |
-  ;;    |                         :ebd-name |                      EBD (name) |                                      PRU provision for EBD |            :string |    50071 |          7 |            |            |
-  ;;    |                       :places-pru |                       PlacesPRU |                                       Number of PRU places |             :int16 |      602 |      49476 |      0.000 |      300.0 |
-  ;;    |                     :ft-prov-name |                   FTProv (name) |                              PRU offer full time provision |            :string |     1654 |      48424 |            |            |
-  ;;    |                 :ed-by-other-name |                EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44544 |       5534 |            |            |
-  ;;    |          :section41-approved-name |        Section41Approved (name) |                                        Section 41 approved |            :string |    50078 |          0 |            |            |
-  ;;    |                        :sen1-name |                     SEN1 (name) |                                                 SEN need 1 |            :string |     5569 |      44509 |            |            |
-  ;;    |                        :sen2-name |                     SEN2 (name) |                                                 SEN need 2 |            :string |     1950 |      48128 |            |            |
-  ;;    |                        :sen3-name |                     SEN3 (name) |                                                 SEN need 3 |            :string |     1164 |      48914 |            |            |
-  ;;    |                        :sen4-name |                     SEN4 (name) |                                                 SEN need 4 |            :string |      810 |      49268 |            |            |
-  ;;    |                        :sen5-name |                     SEN5 (name) |                                                 SEN need 5 |            :string |      586 |      49492 |            |            |
-  ;;    |                        :sen6-name |                     SEN6 (name) |                                                 SEN need 6 |            :string |      508 |      49570 |            |            |
-  ;;    |                        :sen7-name |                     SEN7 (name) |                                                 SEN need 7 |            :string |      451 |      49627 |            |            |
-  ;;    |                        :sen8-name |                     SEN8 (name) |                                                 SEN need 8 |            :string |      378 |      49700 |            |            |
-  ;;    |                        :sen9-name |                     SEN9 (name) |                                                 SEN need 9 |            :string |      297 |      49781 |            |            |
-  ;;    |                       :sen10-name |                    SEN10 (name) |                                                SEN need 10 |            :string |      203 |      49875 |            |            |
-  ;;    |                       :sen11-name |                    SEN11 (name) |                                                SEN need 11 |            :string |      140 |      49938 |            |            |
-  ;;    |                       :sen12-name |                    SEN12 (name) |                                                SEN need 12 |            :string |       95 |      49983 |            |            |
-  ;;    |                       :sen13-name |                    SEN13 (name) |                                                SEN need 13 |            :string |        7 |      50071 |            |            |
-  ;;    | :type-of-resourced-provision-name | TypeOfResourcedProvision (name) |                                Type of resourced provision |            :string |     6904 |      43174 |            |            |
-  ;;    |      :resourced-provision-on-roll |        ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1870 |      48208 |      0.000 |       1872 |
-  ;;    |     :resourced-provision-capacity |      ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1903 |      48175 |      0.000 |       1250 |
-  ;;    |                 :sen-unit-on-roll |                   SenUnitOnRoll |                                    SEN unit number on roll |             :int16 |      853 |      49225 |      0.000 |      427.0 |
-  ;;    |                :sen-unit-capacity |                 SenUnitCapacity |                                          SEN unit capacity |             :int16 |      872 |      49206 |      0.000 |      427.0 |
-  ;;    |                         :sen-stat |                         SENStat |     Number of special pupils under a SEN statement or EHCP |             :int16 |     3636 |      46442 |      0.000 |      311.0 |
-  ;;    |                      :sen-no-stat |                       SENNoStat | Number of special pupils not under a SEN statement or EHCP |             :int16 |     3501 |      46577 |      0.000 |      485.0 |
-  ;;    |                             :uprn |                            UPRN |                                                       UPRN |            :string |    37411 |      12667 |            |            |
-
+  ;;    |                              :urn |                             URN |                                                        URN |            :string |    50294 |          0 |            |            |
+  ;;    |                          :la-code |                       LA (code) |                                                  LA (code) |            :string |    50294 |          0 |            |            |
+  ;;    |                          :la-name |                       LA (name) |                                                         LA |            :string |    50294 |          0 |            |            |
+  ;;    |             :establishment-number |             EstablishmentNumber |                                       Establishment Number |            :string |    50159 |        135 |            |            |
+  ;;    |               :establishment-name |               EstablishmentName |                                      School / College Name |            :string |    50294 |          0 |            |            |
+  ;;    |       :type-of-establishment-code |      TypeOfEstablishment (code) |                                  Establishment type (code) |             :int16 |    50294 |          0 |      1.000 |      56.00 |
+  ;;    |       :type-of-establishment-name |      TypeOfEstablishment (name) |                                         Establishment type |            :string |    50294 |          0 |            |            |
+  ;;    |    :establishment-type-group-code |   EstablishmentTypeGroup (code) |                            Establishment type group (code) |             :int16 |    50294 |          0 |      1.000 |      11.00 |
+  ;;    |    :establishment-type-group-name |   EstablishmentTypeGroup (name) |                                   Establishment type group |            :string |    50294 |          0 |            |            |
+  ;;    |        :establishment-status-code |      EstablishmentStatus (code) |                                Establishment status (code) |             :int16 |    50294 |          0 |      1.000 |      4.000 |
+  ;;    |        :establishment-status-name |      EstablishmentStatus (name) |                                       Establishment status |            :string |    50294 |          0 |            |            |
+  ;;    |                        :open-date |                        OpenDate |                                                  Open date | :packed-local-date |    19781 |      30513 | 1800-01-01 | 2024-01-01 |
+  ;;    |                       :close-date |                       CloseDate |                                                 Close date | :packed-local-date |    22874 |      27420 | 1900-01-01 | 2026-08-31 |
+  ;;    |          :phase-of-education-code |         PhaseOfEducation (code) |                                  Phase of education (code) |             :int16 |    50294 |          0 |      0.000 |      7.000 |
+  ;;    |          :phase-of-education-name |         PhaseOfEducation (name) |                                         Phase of education |            :string |    50294 |          0 |            |            |
+  ;;    |                :statutory-low-age |                 StatutoryLowAge |                                            Age range (low) |             :int16 |    46332 |       3962 |      0.000 |      19.00 |
+  ;;    |               :statutory-high-age |                StatutoryHighAge |                                           Age range (high) |             :int16 |    46335 |       3959 |      3.000 |      99.00 |
+  ;;    |           :nursery-provision-name |         NurseryProvision (name) |                                          Nursery provision |            :string |    50268 |         26 |            |            |
+  ;;    |         :official-sixth-form-code |        OfficialSixthForm (code) |                                 Official sixth form (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |         :official-sixth-form-name |        OfficialSixthForm (name) |                                        Official sixth form |            :string |    50287 |          7 |            |            |
+  ;;    |                  :school-capacity |                  SchoolCapacity |                                            School capacity |             :int16 |    37979 |      12315 |      1.000 |  1.000E+04 |
+  ;;    |             :special-classes-code |           SpecialClasses (code) |                                     Special classes (code) |             :int16 |    50294 |          0 |      0.000 |      9.000 |
+  ;;    |             :special-classes-name |           SpecialClasses (name) |                                            Special classes |            :string |    50173 |        121 |            |            |
+  ;;    |                 :number-of-pupils |                  NumberOfPupils |                                           Number of pupils |             :int16 |    28560 |      21734 |      0.000 |       3442 |
+  ;;    |                            :ukprn |                           UKPRN |                       UK provider reference number (UKPRN) |            :string |    31800 |      18494 |            |            |
+  ;;    |      :further-education-type-name |     FurtherEducationType (name) |                                     Further education type |            :string |    46315 |       3979 |            |            |
+  ;;    |                   :school-website |                   SchoolWebsite |                                                    Website |            :string |    24530 |      25764 |            |            |
+  ;;    |                      :senpru-name |                   SENPRU (name) |                                      PRU provision for SEN |            :string |    50283 |         11 |            |            |
+  ;;    |                         :ebd-name |                      EBD (name) |                                      PRU provision for EBD |            :string |    50287 |          7 |            |            |
+  ;;    |                       :places-pru |                       PlacesPRU |                                       Number of PRU places |             :int16 |      602 |      49692 |      0.000 |      300.0 |
+  ;;    |                     :ft-prov-name |                   FTProv (name) |                              PRU offer full time provision |            :string |     1714 |      48580 |            |            |
+  ;;    |                 :ed-by-other-name |                EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44602 |       5692 |            |            |
+  ;;    |          :section41-approved-name |        Section41Approved (name) |                                        Section 41 approved |            :string |    50294 |          0 |            |            |
+  ;;    |                        :sen1-name |                     SEN1 (name) |                                                 SEN need 1 |            :string |     5582 |      44712 |            |            |
+  ;;    |                        :sen2-name |                     SEN2 (name) |                                                 SEN need 2 |            :string |     1960 |      48334 |            |            |
+  ;;    |                        :sen3-name |                     SEN3 (name) |                                                 SEN need 3 |            :string |     1171 |      49123 |            |            |
+  ;;    |                        :sen4-name |                     SEN4 (name) |                                                 SEN need 4 |            :string |      813 |      49481 |            |            |
+  ;;    |                        :sen5-name |                     SEN5 (name) |                                                 SEN need 5 |            :string |      588 |      49706 |            |            |
+  ;;    |                        :sen6-name |                     SEN6 (name) |                                                 SEN need 6 |            :string |      511 |      49783 |            |            |
+  ;;    |                        :sen7-name |                     SEN7 (name) |                                                 SEN need 7 |            :string |      455 |      49839 |            |            |
+  ;;    |                        :sen8-name |                     SEN8 (name) |                                                 SEN need 8 |            :string |      383 |      49911 |            |            |
+  ;;    |                        :sen9-name |                     SEN9 (name) |                                                 SEN need 9 |            :string |      301 |      49993 |            |            |
+  ;;    |                       :sen10-name |                    SEN10 (name) |                                                SEN need 10 |            :string |      205 |      50089 |            |            |
+  ;;    |                       :sen11-name |                    SEN11 (name) |                                                SEN need 11 |            :string |      142 |      50152 |            |            |
+  ;;    |                       :sen12-name |                    SEN12 (name) |                                                SEN need 12 |            :string |       97 |      50197 |            |            |
+  ;;    |                       :sen13-name |                    SEN13 (name) |                                                SEN need 13 |            :string |        5 |      50289 |            |            |
+  ;;    | :type-of-resourced-provision-name | TypeOfResourcedProvision (name) |                                Type of resourced provision |            :string |     6986 |      43308 |            |            |
+  ;;    |      :resourced-provision-on-roll |        ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1887 |      48407 |      0.000 |       1872 |
+  ;;    |     :resourced-provision-capacity |      ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1920 |      48374 |      0.000 |       1250 |
+  ;;    |                 :sen-unit-on-roll |                   SenUnitOnRoll |                                    SEN unit number on roll |             :int16 |      866 |      49428 |      0.000 |      427.0 |
+  ;;    |                :sen-unit-capacity |                 SenUnitCapacity |                                          SEN unit capacity |             :int16 |      885 |      49409 |      0.000 |      427.0 |
+  ;;    |                         :sen-stat |                         SENStat |     Number of special pupils under a SEN statement or EHCP |             :int16 |     3650 |      46644 |      0.000 |      311.0 |
+  ;;    |                      :sen-no-stat |                       SENNoStat | Number of special pupils not under a SEN statement or EHCP |             :int16 |     3506 |      46788 |      0.000 |      485.0 |
+  ;;    |                             :uprn |                            UPRN |                                                       UPRN |            :string |    37600 |      12694 |            |            |
 
   )
 
