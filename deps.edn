@@ -1,12 +1,13 @@
 {:paths ["src" "resources"]
  :deps  {org.clojure/clojure        {:mvn/version "1.11.1"}
-         techascent/tech.ml.dataset {:mvn/version "6.104"}
-         scicloj/tablecloth         {:mvn/version "6.103.1"
+         techascent/tech.ml.dataset {:mvn/version "7.000-beta-51"}
+         scicloj/tablecloth         {:mvn/version "7.000-beta-51"
                                      :exclusions  [techascent/tech.ml.dataset
-                                                   org.apache.poi/poi-ooxml-schemas]}}
- :aliases
- {:jdk-17 {:jvm-opts ["-XX:-OmitStackTraceInFastThrow"
-                      "-Xlog:gc*:gc.log"
-                      "-XX:+UseZGC"
-                      "--add-modules" "jdk.incubator.foreign,jdk.incubator.vector"
-                      "--enable-native-access=ALL-UNNAMED"]}}}
+                                                   org.apache.poi/poi-ooxml-schemas
+                                                   org.apache.poi/poi
+                                                   org.apache.poi/poi-ooxml]}}
+ :aliases {:jdk-17 {:jvm-opts ["-XX:-OmitStackTraceInFastThrow"
+                               "-Xlog:gc*:gc.log"
+                               "-XX:+UseZGC"
+                               "--add-modules" "jdk.incubator.foreign,jdk.incubator.vector"
+                               "--enable-native-access=ALL-UNNAMED"]}}}
