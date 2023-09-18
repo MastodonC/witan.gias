@@ -7,14 +7,45 @@ See the [GIAS glossary](https://www.get-information-schools.service.gov.uk/gloss
 # Usage
 
 ``` clojure
-(require '[witan.gias.all-data :as gias])
-gias/data-file-name ; Name of file containing establishment data.
-gias/col-names ; Sorted set of keywork column names for the GIAS establishment data.
-gias/col-name->csv-label ; Map keyword column names to the names used in the GIAS CSV file.
-gias/col-name->label ; Map keyword column names to descriptive labels for display.
-gias/->ds ; Dataset of GIAS all establishment data `edubaseall`.
-gias/key-col-names-for-send ; Sorted set of key GIAS columns for SEND work.
-gias/key-cols-for-send->ds ; Dataset of key GIAS columns for SEND for all establishments.
+(require '[witan.gias :as gias])
+gias/default-resource-file-name ; Defalt `edubaseall` resource file of establishment data.
+gias/csv-col-names              ; Sorted set of `edubaseall` CSV column names.
+gias/csv-col-name->label        ; Map `edubaseall` CSV column name to descriptive label.
+gias/csv-col-name->col-name     ; Map `edubaseall` CSV column name to (keyword) column name.
+gias/col-names                  ; Sorted set of (keyword) column names.
+gias/col-name->csv-col-name     ; Map (keyword) column name to `edubaseall` CSV column name.
+gias/col-name->label            ; Map (keyword) column name to descriptive label.
+gias/csv-parser-fn              ; parser-fn map for reading `edubaseall` CSV file with CSV column names.
+gias/key-fn                     ; Default key-fn to be applied to `edubaseall` CSV column names.
+gias/parser-fn                  ; parser-fn map for reading  `edubaseall` CSV file after column names mapped using `key-fn`.
+
+;; Read default `edubaseall` CSV file, with keyword column names.
+(gias/->ds)
+
+;; Read a different `edubaseall` resource file
+(gias/->ds {::gias/resource-file-name "edubasealldata20230817.csv"})
+
+;; Read an `edubaseall` file from specified path
+(gias/->ds {::gias/file-path "/tmp/edubasealldata20230421.csv"})
+
+;; Read selected columns from default `edubaseall`, specified by column name:
+(gias/->ds {:column-whitelist (map gias/col-name->csv-col-name [:urn :establishment-name])})
+
+;; Read "URN" as `:int32` (rather than `:string`):
+(gias/->ds {:column-whitelist (map gias/col-name->csv-col-name [:urn :establishment-name])
+            :parser-fn (assoc gias/parser-fn :urn :int32)})
+
+;; Read seleced columns from default `edubaseall` CSV file with CSV colum names:
+(gias/->ds {:column-whitelist ["URN" "EstablishmentName"]
+            :key-fn           identity
+            :parser-fn        gias/csv-parser-fn})
+
+;; Read selected columns from default `edubaseall` with some custom column names:
+(let [key-fn #((merge gias/csv-col-name->col-name {"EstablishmentName" :gias-establishment-name}) % %)]
+  (gias/->ds {:column-whitelist ["URN" "EstablishmentName"]
+              :key-fn           key-fn
+              :parser-fn        (update-keys gias/csv-parser-fn key-fn)}))
+
 
 ```
 
