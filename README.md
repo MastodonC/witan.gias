@@ -29,20 +29,20 @@ gias/parser-fn                  ; parser-fn map for reading  `edubaseall` CSV fi
 (gias/->ds {::gias/file-path "/tmp/edubasealldata20230421.csv"})
 
 ;; Read selected columns from default `edubaseall`, specified by column name:
-(gias/->ds {:column-whitelist (map gias/col-name->csv-col-name [:urn :establishment-name])})
+(gias/->ds {:column-allowlist (map gias/col-name->csv-col-name [:urn :establishment-name])})
 
 ;; Read "URN" as `:int32` (rather than `:string`):
-(gias/->ds {:column-whitelist (map gias/col-name->csv-col-name [:urn :establishment-name])
+(gias/->ds {:column-allowlist (map gias/col-name->csv-col-name [:urn :establishment-name])
             :parser-fn (assoc gias/parser-fn :urn :int32)})
 
 ;; Read seleced columns from default `edubaseall` CSV file with CSV colum names:
-(gias/->ds {:column-whitelist ["URN" "EstablishmentName"]
+(gias/->ds {:column-allowlist ["URN" "EstablishmentName"]
             :key-fn           identity
             :parser-fn        gias/csv-parser-fn})
 
 ;; Read selected columns from default `edubaseall` with some custom column names:
 (let [key-fn #((merge gias/csv-col-name->col-name {"EstablishmentName" :gias-establishment-name}) % %)]
-  (gias/->ds {:column-whitelist ["URN" "EstablishmentName"]
+  (gias/->ds {:column-allowlist ["URN" "EstablishmentName"]
               :key-fn           key-fn
               :parser-fn        (update-keys gias/csv-parser-fn key-fn)}))
 

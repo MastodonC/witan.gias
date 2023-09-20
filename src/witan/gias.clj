@@ -537,7 +537,9 @@
    Use optional `options` map to specify:
    - CSV file to read: via ::file-path or ::resource-file-name (for files in resource folder).
      [Defaults to ::resource-file-name `default-resource-file-name`.]
-   - Additional or over-riding options for `->dataset`."
+   - Additional or over-riding options for `->dataset`,
+     (with `:column-allowlist` & `:column-blocklist` mapped to anachronisms
+           `:column-whitelist` & `:column-blacklist`)."
   ([] (->ds {}))
   ([{::keys [resource-file-name file-path]
      :or    {resource-file-name default-resource-file-name}
@@ -545,13 +547,15 @@
    (with-open [in (-> (or file-path (io/resource resource-file-name))
                       io/file
                       io/input-stream)]
-     (ds/->dataset in (merge {:file-type    :csv
-                              :separator    ","
-                              :dataset-name (or file-path resource-file-name)
-                              :header-row?  true
-                              :key-fn       key-fn
-                              :parser-fn    parser-fn}
-                             options)))))
+     (ds/->dataset in (update-keys (merge {:file-type    :csv
+                                           :separator    ","
+                                           :dataset-name (or file-path resource-file-name)
+                                           :header-row?  true
+                                           :key-fn       key-fn
+                                           :parser-fn    parser-fn}
+                                          options)
+                                   #({:column-allowlist :column-whitelist
+                                      :column-blocklist :column-blacklist} % %))))))
 
 (comment
   (defn- csv-ds-column-info
@@ -721,7 +725,7 @@
 
 (comment
   ;; Write distinct establishment types to data file
-  (-> (->ds {:column-whitelist (map col-name->csv-col-name [:type-of-establishment-code    :type-of-establishment-name
+  (-> (->ds {:column-allowlist (map col-name->csv-col-name [:type-of-establishment-code    :type-of-establishment-name
                                                             :establishment-type-group-code :establishment-type-group-name])
              :dataset-name     (str (re-find #".+(?=\.csv$)" default-resource-file-name) "-establishment-types" ".csv")})
       (tc/unique-by)
