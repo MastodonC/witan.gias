@@ -9,7 +9,7 @@
 
 
 ;;; # Data files
-(def default-resource-file-name
+(def default-edubaseall-resource-file-name
   "Name of resource file containing default establishment data"
   "edubasealldata20230918.csv")
 
@@ -176,8 +176,7 @@
 
 (def csv-col-name->label
   "Map CSV column name to label.
-
-  Labels adapted from [www.get-information-schools.service.gov.uk/Guidance/EstablishmentBulkUpdate](https://www.get-information-schools.service.gov.uk/Guidance/EstablishmentBulkUpdate)."
+   Labels adapted from [www.get-information-schools.service.gov.uk/Guidance/EstablishmentBulkUpdate](https://www.get-information-schools.service.gov.uk/Guidance/EstablishmentBulkUpdate)."
   (into (sorted-map-by (partial compare-mapped-keys csv-col-name->order)) 
         {"URN"                              "URN"
          "LA (code)"                        "LA (code)"
@@ -535,19 +534,19 @@
 (defn ->ds
   "Read GIAS all establishment data into a dataset.
    Use optional `options` map to specify:
-   - CSV file to read: via ::file-path or ::resource-file-name (for files in resource folder).
-     [Defaults to ::resource-file-name `default-resource-file-name`.]
+   - CSV file to read: via ::edubaseall-file-path or ::edubaseall-resource-file-name (for files in resource folder).
+     [Defaults to ::edubaseall-resource-file-name `default-edubaseall-resource-file-name`.]
    - Additional or over-riding options for `->dataset`."
   ([] (->ds {}))
-  ([{::keys [resource-file-name file-path]
-     :or    {resource-file-name default-resource-file-name}
+  ([{::keys [edubaseall-resource-file-name edubaseall-file-path]
+     :or    {edubaseall-resource-file-name default-edubaseall-resource-file-name}
      :as    options}]
-   (with-open [in (-> (or file-path (io/resource resource-file-name))
+   (with-open [in (-> (or edubaseall-file-path (io/resource edubaseall-resource-file-name))
                       io/file
                       io/input-stream)]
      (ds/->dataset in (merge {:file-type    :csv
                               :separator    ","
-                              :dataset-name (or file-path resource-file-name)
+                              :dataset-name (or edubaseall-file-path edubaseall-resource-file-name)
                               :header-row?  true
                               :key-fn       key-fn
                               :parser-fn    parser-fn}
@@ -565,13 +564,14 @@
         (tc/reorder-columns [:col-name :csv-col-name :col-label])))
 
   (-> (->ds
-       #_{::file-path "/tmp/edubasealldata20230421.csv"}
-       #_{::resource-file-name "edubasealldata20230421.csv"}
-       #_{::resource-file-name "edubasealldata20230817.csv"}
-       #_{::resource-file-name "edubasealldata20230918.csv"}
+       #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20230421.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20230817.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20230918.csv"}
        )
       (csv-ds-column-info col-name->csv-col-name col-name->label)
       (vary-meta assoc :print-index-range 1000))
+
   ;; => edubasealldata20230918.csv: descriptive-stats [140 8]:
   ;;    |                         :col-name |                    :csv-col-name |                                                 :col-label |          :datatype | :n-valid | :n-missing |       :min |       :max |
   ;;    |-----------------------------------|----------------------------------|------------------------------------------------------------|--------------------|---------:|-----------:|------------|------------|
@@ -723,7 +723,7 @@
   ;; Write distinct establishment types to data file
   (-> (->ds {:column-allowlist (map col-name->csv-col-name [:type-of-establishment-code    :type-of-establishment-name
                                                             :establishment-type-group-code :establishment-type-group-name])
-             :dataset-name     (str (re-find #".+(?=\.csv$)" default-resource-file-name) "-establishment-types" ".csv")})
+             :dataset-name     (str (re-find #".+(?=\.csv$)" default-edubaseall-resource-file-name) "-establishment-types" ".csv")})
       (tc/unique-by)
       (tc/order-by [:type-of-establishment-code])
       (as-> $
