@@ -150,8 +150,8 @@
           :col-name     :special-classes-name
           :col-label    "Special classes"}
          {:csv-col-name "CensusDate"
-          :col-name     :census-date
-          :col-label    "Census date"
+          :col-name     :school-census-date
+          :col-label    "School census date"
           :parser-fn    [:packed-local-date parse-date]}
          {:csv-col-name "NumberOfPupils"
           :col-name     :number-of-pupils
@@ -597,7 +597,7 @@
   ;;    |                  :school-capacity |                   SchoolCapacity |                                            School capacity |             :int16 |    38107 |      12314 |      1.000 |  1.000E+04 |
   ;;    |             :special-classes-code |            SpecialClasses (code) |                                     Special classes (code) |             :int16 |    50421 |          0 |      0.000 |      9.000 |
   ;;    |             :special-classes-name |            SpecialClasses (name) |                                            Special classes |            :string |    50301 |        120 |            |            |
-  ;;    |                      :census-date |                       CensusDate |                                                Census date | :packed-local-date |    29058 |      21363 | 2017-01-19 | 2023-01-19 |
+  ;;    |               :school-census-date |                       CensusDate |                                         School census date | :packed-local-date |    29058 |      21363 | 2017-01-19 | 2023-01-19 |
   ;;    |                 :number-of-pupils |                   NumberOfPupils |                                           Number of pupils |             :int16 |    29052 |      21369 |      0.000 |       3440 |
   ;;    |                   :number-of-boys |                     NumberOfBoys |                                             Number of boys |             :int16 |    29045 |      21376 |      0.000 |       1766 |
   ;;    |                  :number-of-girls |                    NumberOfGirls |                                            Number of girls |             :int16 |    29040 |      21381 |      0.000 |       1885 |
