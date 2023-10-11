@@ -297,43 +297,43 @@
           :col-label    "Section 41 approved"}
          {:csv-col-name "SEN1 (name)"
           :col-name     :sen1-name
-          :col-label    "SEN need 1"}
+          :col-label    "Type of SEN provision 1"}
          {:csv-col-name "SEN2 (name)"
           :col-name     :sen2-name
-          :col-label    "SEN need 2"}
+          :col-label    "Type of SEN provision 2"}
          {:csv-col-name "SEN3 (name)"
           :col-name     :sen3-name
-          :col-label    "SEN need 3"}
+          :col-label    "Type of SEN provision 3"}
          {:csv-col-name "SEN4 (name)"
           :col-name     :sen4-name
-          :col-label    "SEN need 4"}
+          :col-label    "Type of SEN provision 4"}
          {:csv-col-name "SEN5 (name)"
           :col-name     :sen5-name
-          :col-label    "SEN need 5"}
+          :col-label    "Type of SEN provision 5"}
          {:csv-col-name "SEN6 (name)"
           :col-name     :sen6-name
-          :col-label    "SEN need 6"}
+          :col-label    "Type of SEN provision 6"}
          {:csv-col-name "SEN7 (name)"
           :col-name     :sen7-name
-          :col-label    "SEN need 7"}
+          :col-label    "Type of SEN provision 7"}
          {:csv-col-name "SEN8 (name)"
           :col-name     :sen8-name
-          :col-label    "SEN need 8"}
+          :col-label    "Type of SEN provision 8"}
          {:csv-col-name "SEN9 (name)"
           :col-name     :sen9-name
-          :col-label    "SEN need 9"}
+          :col-label    "Type of SEN provision 9"}
          {:csv-col-name "SEN10 (name)"
           :col-name     :sen10-name
-          :col-label    "SEN need 10"}
+          :col-label    "Type of SEN provision 10"}
          {:csv-col-name "SEN11 (name)"
           :col-name     :sen11-name
-          :col-label    "SEN need 11"}
+          :col-label    "Type of SEN provision 11"}
          {:csv-col-name "SEN12 (name)"
           :col-name     :sen12-name
-          :col-label    "SEN need 12"}
+          :col-label    "Type of SEN provision 12"}
          {:csv-col-name "SEN13 (name)"
           :col-name     :sen13-name
-          :col-label    "SEN need 13"}
+          :col-label    "Type of SEN provision 13"}
          {:csv-col-name "TypeOfResourcedProvision (name)"
           :col-name     :type-of-resourced-provision-name
           :col-label    "Type of resourced provision"}
@@ -643,19 +643,19 @@
   ;;    |                     :ft-prov-name |                    FTProv (name) |                              PRU offer full time provision |            :string |     1789 |      48632 |            |            |
   ;;    |                 :ed-by-other-name |                 EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44677 |       5744 |            |            |
   ;;    |          :section41-approved-name |         Section41Approved (name) |                                        Section 41 approved |            :string |    50421 |          0 |            |            |
-  ;;    |                        :sen1-name |                      SEN1 (name) |                                                 SEN need 1 |            :string |     5599 |      44822 |            |            |
-  ;;    |                        :sen2-name |                      SEN2 (name) |                                                 SEN need 2 |            :string |     1974 |      48447 |            |            |
-  ;;    |                        :sen3-name |                      SEN3 (name) |                                                 SEN need 3 |            :string |     1177 |      49244 |            |            |
-  ;;    |                        :sen4-name |                      SEN4 (name) |                                                 SEN need 4 |            :string |      819 |      49602 |            |            |
-  ;;    |                        :sen5-name |                      SEN5 (name) |                                                 SEN need 5 |            :string |      594 |      49827 |            |            |
-  ;;    |                        :sen6-name |                      SEN6 (name) |                                                 SEN need 6 |            :string |      516 |      49905 |            |            |
-  ;;    |                        :sen7-name |                      SEN7 (name) |                                                 SEN need 7 |            :string |      460 |      49961 |            |            |
-  ;;    |                        :sen8-name |                      SEN8 (name) |                                                 SEN need 8 |            :string |      387 |      50034 |            |            |
-  ;;    |                        :sen9-name |                      SEN9 (name) |                                                 SEN need 9 |            :string |      304 |      50117 |            |            |
-  ;;    |                       :sen10-name |                     SEN10 (name) |                                                SEN need 10 |            :string |      207 |      50214 |            |            |
-  ;;    |                       :sen11-name |                     SEN11 (name) |                                                SEN need 11 |            :string |      142 |      50279 |            |            |
-  ;;    |                       :sen12-name |                     SEN12 (name) |                                                SEN need 12 |            :string |       98 |      50323 |            |            |
-  ;;    |                       :sen13-name |                     SEN13 (name) |                                                SEN need 13 |            :string |        5 |      50416 |            |            |
+  ;;    |                        :sen1-name |                      SEN1 (name) |                                    Type of SEN provision 1 |            :string |     5599 |      44822 |            |            |
+  ;;    |                        :sen2-name |                      SEN2 (name) |                                    Type of SEN provision 2 |            :string |     1974 |      48447 |            |            |
+  ;;    |                        :sen3-name |                      SEN3 (name) |                                    Type of SEN provision 3 |            :string |     1177 |      49244 |            |            |
+  ;;    |                        :sen4-name |                      SEN4 (name) |                                    Type of SEN provision 4 |            :string |      819 |      49602 |            |            |
+  ;;    |                        :sen5-name |                      SEN5 (name) |                                    Type of SEN provision 5 |            :string |      594 |      49827 |            |            |
+  ;;    |                        :sen6-name |                      SEN6 (name) |                                    Type of SEN provision 6 |            :string |      516 |      49905 |            |            |
+  ;;    |                        :sen7-name |                      SEN7 (name) |                                    Type of SEN provision 7 |            :string |      460 |      49961 |            |            |
+  ;;    |                        :sen8-name |                      SEN8 (name) |                                    Type of SEN provision 8 |            :string |      387 |      50034 |            |            |
+  ;;    |                        :sen9-name |                      SEN9 (name) |                                    Type of SEN provision 9 |            :string |      304 |      50117 |            |            |
+  ;;    |                       :sen10-name |                     SEN10 (name) |                                   Type of SEN provision 10 |            :string |      207 |      50214 |            |            |
+  ;;    |                       :sen11-name |                     SEN11 (name) |                                   Type of SEN provision 11 |            :string |      142 |      50279 |            |            |
+  ;;    |                       :sen12-name |                     SEN12 (name) |                                   Type of SEN provision 12 |            :string |       98 |      50323 |            |            |
+  ;;    |                       :sen13-name |                     SEN13 (name) |                                   Type of SEN provision 13 |            :string |        5 |      50416 |            |            |
   ;;    | :type-of-resourced-provision-name |  TypeOfResourcedProvision (name) |                                Type of resourced provision |            :string |     7033 |      43388 |            |            |
   ;;    |      :resourced-provision-on-roll |         ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1900 |      48521 |      0.000 |       1872 |
   ;;    |     :resourced-provision-capacity |       ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1933 |      48488 |      0.000 |       1250 |
