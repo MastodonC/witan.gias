@@ -26,7 +26,9 @@
 
 
 
-;;; # Column names, labels and types
+
+;;; # edubaseall
+;;; ## Column names, labels and types
 (def edubaseall-csv-columns
   "Map (ordered) edubaseall CSV column names to (maps of) metadata.
    Labels adapted from [www.get-information-schools.service.gov.uk/Guidance/EstablishmentBulkUpdate](https://www.get-information-schools.service.gov.uk/Guidance/EstablishmentBulkUpdate)."
@@ -497,8 +499,7 @@
     (into (sorted-map-by (partial compare-mapped-keys (update-vals $ :csv-col-num))) $)))
 
 
-
-;;; # Read establishment data
+;;; ## Read establishment data
 (def edubaseall-csv-parser-fn
   "Default parser-fn for ds/->dataset read of edubaseall with CSV column names."
   (as-> edubaseall-csv-columns $
@@ -712,4 +713,170 @@
       (tc/order-by [:type-of-establishment-code])
       (as-> $
           (tc/write! $ (str "./data/" (tc/dataset-name $)))))
+  )
+
+
+
+;;; # edubaseall for SEND
+(def edubaseall-send-columns
+  (as-> [:urn
+         :last-changed-date
+         ;; Establishment
+         :ukprn
+         :establishment-number
+         :establishment-name
+         :type-of-establishment-name
+         :establishment-type-group-name
+         :la-code
+         :la-name
+         ;; Status
+         :establishment-status-name
+         :open-date
+         :close-date
+         ;; Phase & ages
+         :phase-of-education-name
+         :statutory-low-age
+         :statutory-high-age
+         :further-education-type-name
+         ;; Overall capacity & NOR
+         :school-census-date
+         :school-capacity
+         :number-of-pupils
+         ;; PRU
+         :places-pru
+         :senpru-name
+         ;; Special classes and #EHCPs
+         :special-classes-name
+         :sen-stat
+         :sen-no-stat
+         ;; RP & SENU Provision
+         #_:type-of-resourced-provision-name
+         :sen-unit?                         ; derived
+         :sen-unit-capacity
+         :sen-unit-on-roll
+         :resourced-provision?              ; derived
+         :resourced-provision-capacity
+         :resourced-provision-on-roll
+         ;; SEN provision types
+         :sen-provision-types-vec           ; derived
+         ] $
+    ;; Add order and (for columns coming from CSV file) column details
+    (map-indexed (fn [idx k] {k (merge {:col-idx idx
+                                        :col-name k}
+                                       (select-keys (edubaseall-columns k) [:csv-col-name :col-label]))}) $)
+    (into {} $)
+    ;; Add details for derived columns
+    (merge-with merge $ {:sen-provision-types-vec {:derived?  true
+                                                   :col-label "SEN Provision Types (derived)"}
+                         :sen-unit?               {:derived?  true
+                                                   :col-label "SEN Unit? (derived)"}
+                         :resourced-provision?    {:derived?  true
+                                                   :col-label "Resourced Provision? (derived)"}})
+    ;; Order the map
+    (into (sorted-map-by (partial compare-mapped-keys (update-vals $ :col-idx))) $)))
+
+(defn edubaseall-send->ds
+  "Read SEND related columns from GIAS edubaseall \"all establishment\" data from CSV file into a dataset
+     with default column names, with additional derived columns:
+     - `:sen-provision-types-vec` - vector of (upper-case) SEN provision type abbreviations extracted from \"SEN1\"-\"SEN13\"
+     - `:resourced-provision?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has RP.
+     - `:sen-unit?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has a SENU.
+     Use optional `options` map to specify:
+     - CSV file to read: via `::edubaseall-file-path` or `::edubaseall-resource-file-name` (for files in resource folder).
+       [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
+     - Additional or over-riding options for `->dataset`
+       (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
+  ([] (edubaseall-send->ds {}))
+  ([options]
+   (let [sen-provision-type-columns [:sen1-name  :sen2-name  :sen3-name  :sen4-name  :sen5-name
+                                     :sen6-name  :sen7-name  :sen8-name  :sen9-name  :sen10-name
+                                     :sen11-name :sen12-name :sen13-name]
+         columns-to-read            ((comp distinct concat)
+                                     (keys edubaseall-send-columns)
+                                     sen-provision-type-columns
+                                     [:type-of-resourced-provision-name])
+         csv-columns-to-read        (keep (update-vals edubaseall-columns :csv-col-name) columns-to-read)]
+     (-> (edubaseall->ds (-> options
+                             (dissoc :key-fn :column-blocklist)
+                             (assoc :column-allowlist csv-columns-to-read)))
+         ;; Parse `:type-of-resourced-provision-name` into separate booleans for RP & SENU
+         (tc/map-columns :resourced-provision?
+                         [:type-of-resourced-provision-name]
+                         #({"Not applicable"                   false
+                            "Resourced provision"              true
+                            "Resourced provision and SEN unit" true
+                            "SEN unit"                         false} % %))
+         (tc/map-columns :sen-unit?
+                         [:type-of-resourced-provision-name]
+                         #({"Not applicable"                   false
+                            "Resourced provision"              false
+                            "Resourced provision and SEN unit" true
+                            "SEN unit"                         true} % %))
+         ;; Pack SEN provision type abbreviations (upper-case) into a vector
+         (tc/map-columns :sen-provision-types-vec
+                         sen-provision-type-columns
+                         (fn [& args] (into []
+                                            (keep #({"Not Applicable"                                   nil
+                                                     "SpLD - Specific Learning Difficulty"              "SPLD" ; Note upper-case
+                                                     "MLD - Moderate Learning Difficulty"               "MLD"
+                                                     "SLD - Severe Learning Difficulty"                 "SLD"
+                                                     "PMLD - Profound and Multiple Learning Difficulty" "PMLD"
+                                                     "SEMH - Social, Emotional and Mental Health"       "SEMH"
+                                                     "SLCN - Speech, language and Communication"        "SLCN"
+                                                     "HI - Hearing Impairment"                          "HI"
+                                                     "VI - Visual Impairment"                           "VI"
+                                                     "MSI - Multi-Sensory Impairment"                   "MSI"
+                                                     "PD - Physical Disability"                         "PD"
+                                                     "ASD - Autistic Spectrum Disorder"                 "ASD"
+                                                     "OTH - Other Difficulty/Disability"                "OTH"} % %)) args)))
+         ;; Arrange dataset
+         (tc/select-columns (keys edubaseall-send-columns))
+         (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)")))))))
+
+(comment
+  (-> (edubaseall-send->ds
+       #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20230421.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20230817.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20230918.csv"}
+       )
+      (csv-ds-column-info (update-vals edubaseall-send-columns :csv-col-name)
+                          (update-vals edubaseall-send-columns :col-label))
+      (vary-meta assoc :print-index-range 1000))
+
+  ;; => edubasealldata20230918.csv (SEND columns): descriptive-stats [31 8]:
+  ;;    |                      :col-name |                 :csv-col-name |                                                 :col-label |          :datatype | :n-valid | :n-missing |       :min |       :max |
+  ;;    |--------------------------------|-------------------------------|------------------------------------------------------------|--------------------|---------:|-----------:|------------|------------|
+  ;;    |                           :urn |                           URN |                                                        URN |            :string |    50421 |          0 |            |            |
+  ;;    |             :last-changed-date |               LastChangedDate |                                          Last Changed Date | :packed-local-date |    50421 |          0 | 2013-10-24 | 2023-09-18 |
+  ;;    |                         :ukprn |                         UKPRN |                       UK provider reference number (UKPRN) |            :string |    31909 |      18512 |            |            |
+  ;;    |          :establishment-number |           EstablishmentNumber |                                       Establishment Number |            :string |    50286 |        135 |            |            |
+  ;;    |            :establishment-name |             EstablishmentName |                                      School / College Name |            :string |    50421 |          0 |            |            |
+  ;;    |    :type-of-establishment-name |    TypeOfEstablishment (name) |                                         Establishment type |            :string |    50421 |          0 |            |            |
+  ;;    | :establishment-type-group-name | EstablishmentTypeGroup (name) |                                   Establishment type group |            :string |    50421 |          0 |            |            |
+  ;;    |                       :la-code |                     LA (code) |                                                  LA (code) |            :string |    50421 |          0 |            |            |
+  ;;    |                       :la-name |                     LA (name) |                                                         LA |            :string |    50421 |          0 |            |            |
+  ;;    |     :establishment-status-name |    EstablishmentStatus (name) |                                       Establishment status |            :string |    50421 |          0 |            |            |
+  ;;    |                     :open-date |                      OpenDate |                                                  Open date | :packed-local-date |    19920 |      30501 | 1800-01-01 | 2024-01-01 |
+  ;;    |                    :close-date |                     CloseDate |                                                 Close date | :packed-local-date |    22990 |      27431 | 1900-01-01 | 2026-08-31 |
+  ;;    |       :phase-of-education-name |       PhaseOfEducation (name) |                                         Phase of education |            :string |    50421 |          0 |            |            |
+  ;;    |             :statutory-low-age |               StatutoryLowAge |                                            Age range (low) |             :int16 |    46461 |       3960 |      0.000 |      19.00 |
+  ;;    |            :statutory-high-age |              StatutoryHighAge |                                           Age range (high) |             :int16 |    46464 |       3957 |      3.000 |      99.00 |
+  ;;    |   :further-education-type-name |   FurtherEducationType (name) |                                     Further education type |            :string |    46315 |       4106 |            |            |
+  ;;    |            :school-census-date |                    CensusDate |                                         School census date | :packed-local-date |    29058 |      21363 | 2017-01-19 | 2023-01-19 |
+  ;;    |               :school-capacity |                SchoolCapacity |                                            School capacity |             :int16 |    38107 |      12314 |      1.000 |  1.000E+04 |
+  ;;    |              :number-of-pupils |                NumberOfPupils |                                           Number of pupils |             :int16 |    29052 |      21369 |      0.000 |       3440 |
+  ;;    |                    :places-pru |                     PlacesPRU |                                       Number of PRU places |             :int16 |      602 |      49819 |      0.000 |      300.0 |
+  ;;    |                   :senpru-name |                 SENPRU (name) |                                      PRU provision for SEN |            :string |    50410 |         11 |            |            |
+  ;;    |          :special-classes-name |         SpecialClasses (name) |                                            Special classes |            :string |    50301 |        120 |            |            |
+  ;;    |                      :sen-stat |                       SENStat |     Number of special pupils under a SEN statement or EHCP |             :int16 |     3655 |      46766 |      0.000 |      311.0 |
+  ;;    |                   :sen-no-stat |                     SENNoStat | Number of special pupils not under a SEN statement or EHCP |             :int16 |     3508 |      46913 |      0.000 |      485.0 |
+  ;;    |                     :sen-unit? |                               |                                        SEN Unit? (derived) |           :boolean |     7033 |      43388 |            |            |
+  ;;    |             :sen-unit-capacity |               SenUnitCapacity |                                          SEN unit capacity |             :int16 |      886 |      49535 |      0.000 |      427.0 |
+  ;;    |              :sen-unit-on-roll |                 SenUnitOnRoll |                                    SEN unit number on roll |             :int16 |      867 |      49554 |      0.000 |      427.0 |
+  ;;    |          :resourced-provision? |                               |                             Resourced Provision? (derived) |           :boolean |     7033 |      43388 |            |            |
+  ;;    |  :resourced-provision-capacity |    ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1933 |      48488 |      0.000 |       1250 |
+  ;;    |   :resourced-provision-on-roll |      ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1900 |      48521 |      0.000 |       1872 |
+  ;;    |       :sen-provision-types-vec |                               |                              SEN Provision Types (derived) | :persistent-vector |    50421 |          0 |            |            |
+
   )
