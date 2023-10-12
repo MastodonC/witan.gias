@@ -281,7 +281,7 @@
           :col-name     :senpru-name
           :col-label    "PRU provision for SEN"}
          {:csv-col-name "EBD (name)"
-          :col-name     :ebd-name
+          :col-name     :pru-ebd-name
           :col-label    "PRU provision for EBD"}
          {:csv-col-name "PlacesPRU"
           :col-name     :places-pru
@@ -467,8 +467,8 @@
           :col-label    "FSM"}
          {:csv-col-name "AccreditationExpiryDate"
           :col-name     :accreditation-expiry-date
-          :col-label    "Accreditation expiry date"}]
-      $
+          :col-label    "Accreditation expiry date"
+          :parser-fn    [:packed-local-date parse-date]}] $
     ;; Add CSV file column numbers (for ordering)
     (map-indexed (fn [idx m] (assoc m :csv-col-num (inc idx))) $)
     ;; Extract into a map with `:csv-col-name`s as keys
@@ -517,8 +517,8 @@
 (defn edubaseall->ds
   "Read GIAS edubaseall \"all establishment\" data from CSV file into a dataset.
    Use optional `options` map to specify:
-   - CSV file to read: via ::edubaseall-file-path or ::edubaseall-resource-file-name (for files in resource folder).
-     [Defaults to ::edubaseall-resource-file-name `default-edubaseall-resource-file-name`.]
+   - CSV file to read: via `::edubaseall-file-path` or `::edubaseall-resource-file-name` (for files in resource folder).
+     [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
    - Additional or over-riding options for `->dataset`."
   ([] (edubaseall->ds {}))
   ([{::keys [edubaseall-resource-file-name edubaseall-file-path]
@@ -638,7 +638,7 @@
   ;;    |                 :teen-moth-places |                   TeenMothPlaces |                                   Teenage mothers capacity |             :int16 |       98 |      50323 |      0.000 |      45.00 |
   ;;    |                         :ccf-name |                       CCF (name) |                                      Child care facilities |            :string |    44688 |       5733 |            |            |
   ;;    |                      :senpru-name |                    SENPRU (name) |                                      PRU provision for SEN |            :string |    50410 |         11 |            |            |
-  ;;    |                         :ebd-name |                       EBD (name) |                                      PRU provision for EBD |            :string |    50414 |          7 |            |            |
+  ;;    |                     :pru-ebd-name |                       EBD (name) |                                      PRU provision for EBD |            :string |    50414 |          7 |            |            |
   ;;    |                       :places-pru |                        PlacesPRU |                                       Number of PRU places |             :int16 |      602 |      49819 |      0.000 |      300.0 |
   ;;    |                     :ft-prov-name |                    FTProv (name) |                              PRU offer full time provision |            :string |     1789 |      48632 |            |            |
   ;;    |                 :ed-by-other-name |                 EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44677 |       5744 |            |            |
@@ -698,7 +698,7 @@
   ;;    |                        :msoa-code |                      MSOA (code) |                                                MSOA (code) |            :string |    50421 |          0 |            |            |
   ;;    |                        :lsoa-code |                      LSOA (code) |                                                LSOA (code) |            :string |    50421 |          0 |            |            |
   ;;    |                              :fsm |                              FSM |                                                        FSM |             :int16 |    28851 |      21570 |      0.000 |      925.0 |
-  ;;    |        :accreditation-expiry-date |          AccreditationExpiryDate |                                  Accreditation expiry date |           :boolean |        0 |      50421 |            |            |
+  ;;    |        :accreditation-expiry-date |          AccreditationExpiryDate |                                  Accreditation expiry date | :packed-local-date |        0 |      50421 | 1970-01-01 | 1970-01-01 |
 
   )
 
