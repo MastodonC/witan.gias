@@ -24,7 +24,22 @@
   [s]
   (java.time.LocalDate/parse s (java.time.format.DateTimeFormatter/ofPattern "dd-MM-uuuu")))
 
-
+(defn- parse-sen-provision-type-name
+  "Parse contents of \"SEN# (name)\" columns into standard (upper-case) EHCP primary need abbreviations"
+  [s]
+  (get {"Not Applicable"                                   ::ds/missing ; Note missing
+        "SpLD - Specific Learning Difficulty"              "SPLD"       ; Note upper-case
+        "MLD - Moderate Learning Difficulty"               "MLD"
+        "SLD - Severe Learning Difficulty"                 "SLD"
+        "PMLD - Profound and Multiple Learning Difficulty" "PMLD"
+        "SEMH - Social, Emotional and Mental Health"       "SEMH"
+        "SLCN - Speech, language and Communication"        "SLCN"
+        "HI - Hearing Impairment"                          "HI"
+        "VI - Visual Impairment"                           "VI"
+        "MSI - Multi-Sensory Impairment"                   "MSI"
+        "PD - Physical Disability"                         "PD"
+        "ASD - Autistic Spectrum Disorder"                 "ASD"
+        "OTH - Other Difficulty/Disability"                "OTH"} s s))
 
 
 ;;; # edubaseall
@@ -298,44 +313,57 @@
           :col-name     :section41-approved-name
           :col-label    "Section 41 approved"}
          {:csv-col-name "SEN1 (name)"
-          :col-name     :sen1-name
-          :col-label    "Type of SEN provision 1"}
+          :col-name     :sen-provision-type-1
+          :col-label    "Type of SEN provision 1"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN2 (name)"
-          :col-name     :sen2-name
-          :col-label    "Type of SEN provision 2"}
+          :col-name     :sen-provision-type-2
+          :col-label    "Type of SEN provision 2"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN3 (name)"
-          :col-name     :sen3-name
-          :col-label    "Type of SEN provision 3"}
+          :col-name     :sen-provision-type-3
+          :col-label    "Type of SEN provision 3"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN4 (name)"
-          :col-name     :sen4-name
-          :col-label    "Type of SEN provision 4"}
+          :col-name     :sen-provision-type-4
+          :col-label    "Type of SEN provision 4"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN5 (name)"
-          :col-name     :sen5-name
-          :col-label    "Type of SEN provision 5"}
+          :col-name     :sen-provision-type-5
+          :col-label    "Type of SEN provision 5"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN6 (name)"
-          :col-name     :sen6-name
-          :col-label    "Type of SEN provision 6"}
+          :col-name     :sen-provision-type-6
+          :col-label    "Type of SEN provision 6"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN7 (name)"
-          :col-name     :sen7-name
-          :col-label    "Type of SEN provision 7"}
+          :col-name     :sen-provision-type-7
+          :col-label    "Type of SEN provision 7"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN8 (name)"
-          :col-name     :sen8-name
-          :col-label    "Type of SEN provision 8"}
+          :col-name     :sen-provision-type-8
+          :col-label    "Type of SEN provision 8"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN9 (name)"
-          :col-name     :sen9-name
-          :col-label    "Type of SEN provision 9"}
+          :col-name     :sen-provision-type-9
+          :col-label    "Type of SEN provision 9"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN10 (name)"
-          :col-name     :sen10-name
-          :col-label    "Type of SEN provision 10"}
+          :col-name     :sen-provision-type-10
+          :col-label    "Type of SEN provision 10"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN11 (name)"
-          :col-name     :sen11-name
-          :col-label    "Type of SEN provision 11"}
+          :col-name     :sen-provision-type-11
+          :col-label    "Type of SEN provision 11"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN12 (name)"
-          :col-name     :sen12-name
-          :col-label    "Type of SEN provision 12"}
+          :col-name     :sen-provision-type-12
+          :col-label    "Type of SEN provision 12"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "SEN13 (name)"
-          :col-name     :sen13-name
-          :col-label    "Type of SEN provision 13"}
+          :col-name     :sen-provision-type-13
+          :col-label    "Type of SEN provision 13"
+          :parser-fn    [:string parse-sen-provision-type-name]}
          {:csv-col-name "TypeOfResourcedProvision (name)"
           :col-name     :type-of-resourced-provision-name
           :col-label    "Type of resourced provision"}
@@ -644,19 +672,19 @@
   ;;    |                     :ft-prov-name |                    FTProv (name) |                              PRU offer full time provision |            :string |     1789 |      48632 |            |            |
   ;;    |                 :ed-by-other-name |                 EdByOther (name) |                       PRU offer tuition by anther provider |            :string |    44677 |       5744 |            |            |
   ;;    |          :section41-approved-name |         Section41Approved (name) |                                        Section 41 approved |            :string |    50421 |          0 |            |            |
-  ;;    |                        :sen1-name |                      SEN1 (name) |                                    Type of SEN provision 1 |            :string |     5599 |      44822 |            |            |
-  ;;    |                        :sen2-name |                      SEN2 (name) |                                    Type of SEN provision 2 |            :string |     1974 |      48447 |            |            |
-  ;;    |                        :sen3-name |                      SEN3 (name) |                                    Type of SEN provision 3 |            :string |     1177 |      49244 |            |            |
-  ;;    |                        :sen4-name |                      SEN4 (name) |                                    Type of SEN provision 4 |            :string |      819 |      49602 |            |            |
-  ;;    |                        :sen5-name |                      SEN5 (name) |                                    Type of SEN provision 5 |            :string |      594 |      49827 |            |            |
-  ;;    |                        :sen6-name |                      SEN6 (name) |                                    Type of SEN provision 6 |            :string |      516 |      49905 |            |            |
-  ;;    |                        :sen7-name |                      SEN7 (name) |                                    Type of SEN provision 7 |            :string |      460 |      49961 |            |            |
-  ;;    |                        :sen8-name |                      SEN8 (name) |                                    Type of SEN provision 8 |            :string |      387 |      50034 |            |            |
-  ;;    |                        :sen9-name |                      SEN9 (name) |                                    Type of SEN provision 9 |            :string |      304 |      50117 |            |            |
-  ;;    |                       :sen10-name |                     SEN10 (name) |                                   Type of SEN provision 10 |            :string |      207 |      50214 |            |            |
-  ;;    |                       :sen11-name |                     SEN11 (name) |                                   Type of SEN provision 11 |            :string |      142 |      50279 |            |            |
-  ;;    |                       :sen12-name |                     SEN12 (name) |                                   Type of SEN provision 12 |            :string |       98 |      50323 |            |            |
-  ;;    |                       :sen13-name |                     SEN13 (name) |                                   Type of SEN provision 13 |            :string |        5 |      50416 |            |            |
+  ;;    |             :sen-provision-type-1 |                      SEN1 (name) |                                    Type of SEN provision 1 |            :string |     5533 |      44888 |            |            |
+  ;;    |             :sen-provision-type-2 |                      SEN2 (name) |                                    Type of SEN provision 2 |            :string |     1974 |      48447 |            |            |
+  ;;    |             :sen-provision-type-3 |                      SEN3 (name) |                                    Type of SEN provision 3 |            :string |     1177 |      49244 |            |            |
+  ;;    |             :sen-provision-type-4 |                      SEN4 (name) |                                    Type of SEN provision 4 |            :string |      819 |      49602 |            |            |
+  ;;    |             :sen-provision-type-5 |                      SEN5 (name) |                                    Type of SEN provision 5 |            :string |      594 |      49827 |            |            |
+  ;;    |             :sen-provision-type-6 |                      SEN6 (name) |                                    Type of SEN provision 6 |            :string |      516 |      49905 |            |            |
+  ;;    |             :sen-provision-type-7 |                      SEN7 (name) |                                    Type of SEN provision 7 |            :string |      460 |      49961 |            |            |
+  ;;    |             :sen-provision-type-8 |                      SEN8 (name) |                                    Type of SEN provision 8 |            :string |      387 |      50034 |            |            |
+  ;;    |             :sen-provision-type-9 |                      SEN9 (name) |                                    Type of SEN provision 9 |            :string |      304 |      50117 |            |            |
+  ;;    |            :sen-provision-type-10 |                     SEN10 (name) |                                   Type of SEN provision 10 |            :string |      207 |      50214 |            |            |
+  ;;    |            :sen-provision-type-11 |                     SEN11 (name) |                                   Type of SEN provision 11 |            :string |      142 |      50279 |            |            |
+  ;;    |            :sen-provision-type-12 |                     SEN12 (name) |                                   Type of SEN provision 12 |            :string |       98 |      50323 |            |            |
+  ;;    |            :sen-provision-type-13 |                     SEN13 (name) |                                   Type of SEN provision 13 |            :string |        5 |      50416 |            |            |
   ;;    | :type-of-resourced-provision-name |  TypeOfResourcedProvision (name) |                                Type of resourced provision |            :string |     7033 |      43388 |            |            |
   ;;    |      :resourced-provision-on-roll |         ResourcedProvisionOnRoll |                         Resourced provision number on roll |             :int16 |     1900 |      48521 |      0.000 |       1872 |
   ;;    |     :resourced-provision-capacity |       ResourcedProvisionCapacity |                               Resourced provision capacity |             :int16 |     1933 |      48488 |      0.000 |       1250 |
@@ -788,9 +816,7 @@
        (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
   ([] (edubaseall-send->ds {}))
   ([options]
-   (let [sen-provision-type-columns [:sen1-name  :sen2-name  :sen3-name  :sen4-name  :sen5-name
-                                     :sen6-name  :sen7-name  :sen8-name  :sen9-name  :sen10-name
-                                     :sen11-name :sen12-name :sen13-name]
+   (let [sen-provision-type-columns (map (comp keyword (partial format "sen-provision-type-%,d")) (range 1 14))
          columns-to-read            ((comp distinct concat)
                                      (keys edubaseall-send-columns)
                                      sen-provision-type-columns
@@ -812,23 +838,8 @@
                             "Resourced provision"              false
                             "Resourced provision and SEN unit" true
                             "SEN unit"                         true} % %))
-         ;; Pack SEN provision type abbreviations (upper-case) into a vector
-         (tc/map-columns :sen-provision-types-vec
-                         sen-provision-type-columns
-                         (fn [& args] (into []
-                                            (keep #({"Not Applicable"                                   nil
-                                                     "SpLD - Specific Learning Difficulty"              "SPLD" ; Note upper-case
-                                                     "MLD - Moderate Learning Difficulty"               "MLD"
-                                                     "SLD - Severe Learning Difficulty"                 "SLD"
-                                                     "PMLD - Profound and Multiple Learning Difficulty" "PMLD"
-                                                     "SEMH - Social, Emotional and Mental Health"       "SEMH"
-                                                     "SLCN - Speech, language and Communication"        "SLCN"
-                                                     "HI - Hearing Impairment"                          "HI"
-                                                     "VI - Visual Impairment"                           "VI"
-                                                     "MSI - Multi-Sensory Impairment"                   "MSI"
-                                                     "PD - Physical Disability"                         "PD"
-                                                     "ASD - Autistic Spectrum Disorder"                 "ASD"
-                                                     "OTH - Other Difficulty/Disability"                "OTH"} % %)) args)))
+         ;; Pack non-nil SEN provision type abbreviations into a vector
+         (tc/map-columns :sen-provision-types-vec sen-provision-type-columns #(filterv some? %&))
          ;; Arrange dataset
          (tc/select-columns (keys edubaseall-send-columns))
          (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)")))))))
@@ -880,3 +891,4 @@
   ;;    |       :sen-provision-types-vec |                               |                              SEN Provision Types (derived) | :persistent-vector |    50421 |          0 |            |            |
 
   )
+
