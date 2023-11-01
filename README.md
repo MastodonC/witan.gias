@@ -32,7 +32,7 @@ gias/default-edubaseall-resource-file-name
 
 ### SEN Provision Type strings are parsed
 
-Note that the "SEN Provision Type" strings in CSV columns "SEN13(name)" to "SEN13 (name)" are parsed to:
+Note that the "SEN Provision Type" strings in CSV columns "SEN1 (name)" to "SEN13 (name)" are parsed to:
 
 - Return abbreviations only, not "<ABBREVIATION> - <NAME>" or "Not Applicable" as is in the edubaseall CSV.
 - Return abbreviations in upper case, which results in "SpLD" in the edubaseall CSV being returned as "SPLD" (which is the abbreviation used in the SEN2 return).
