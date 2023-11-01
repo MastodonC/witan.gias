@@ -34,7 +34,7 @@ gias/default-edubaseall-resource-file-name
 
 Note that the "SEN Provision Type" strings in CSV columns "SEN1 (name)" to "SEN13 (name)" are parsed to:
 
-- Return abbreviations only, not "``ABBREVIATION` - `NAME`" or "Not Applicable" as is in the edubaseall CSV.
+- Return abbreviations only, not "ABBREVIATION - NAME" or "Not Applicable" as is in the edubaseall CSV.
 - Return abbreviations in upper case, which results in "SpLD" in the edubaseall CSV being returned as "SPLD" (which is the abbreviation used in the SEN2 return).
 - Map "Not Applicable" (used in "SEN1 (name)" to missing. 
   (Note however that some schools have SEN provision type 1 entered as "Not Applicable" but still have some of types 2-13 filled in!?)
