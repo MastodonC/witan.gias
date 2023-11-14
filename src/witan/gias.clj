@@ -844,6 +844,23 @@
          (tc/select-columns (keys edubaseall-send-columns))
          (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)")))))))
 
+(defn edubaseall-send->map
+  "Read SEND related columns from GIAS edubaseall \"all establishment\" data from CSV file and return as a map keyed by URN
+     with values maps containing column values keyed by column names, with additional derived keys:
+     - `:sen-provision-types-vec` - vector of (upper-case) SEN provision type abbreviations extracted from \"SEN1\"-\"SEN13\"
+     - `:resourced-provision?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has RP.
+     - `:sen-unit?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has a SENU.
+     Use optional `options` map to specify:
+     - CSV file to read: via `::edubaseall-file-path` or `::edubaseall-resource-file-name` (for files in resource folder).
+       [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
+     - Additional or over-riding options for `->dataset`
+       (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
+  ([] (edubaseall-send->map {}))
+  ([options]
+   (let [edubaseall-send-ds (edubaseall-send->ds options)]
+     (zipmap (edubaseall-send-ds :urn)
+             (tc/rows edubaseall-send-ds :as-maps)))))
+
 (comment
   (-> (edubaseall-send->ds
        #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
