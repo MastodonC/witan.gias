@@ -10,7 +10,7 @@
 ;;; # Data files
 (def default-edubaseall-resource-file-name
   "Name of default edubaseall resource file containing all establishment data"
-  "edubasealldata20240717.csv")
+  "edubasealldata20250109.csv")
 
 
 
@@ -449,7 +449,7 @@
          {:csv-col-name "OfstedRating (name)"
           :col-name     :ofsted-rating-name
           :col-label    "OFSTED rating"}
-         {:csv-col-name "RSCRegion (name)" ; Not in file downloaded 2024-07-17
+         {:csv-col-name "RSCRegion (name)" ; Not in files downloaded on/after 2024-07-17.
           :col-name     :rsc-region-name
           :col-label    "RSC region"}
          {:csv-col-name "Country (name)"
@@ -573,8 +573,8 @@
 
   (-> (edubaseall->ds ; Examine structure of edubaseall-send dataset
        #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
-       #_{::edubaseall-resource-file-name "edubasealldata20240524.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20240717.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20250109.csv"}
        )
       (csv-ds-column-info (update-vals edubaseall-columns :csv-col-name)
                           (update-vals edubaseall-columns :col-label))
@@ -595,6 +595,7 @@
       (tc/order-by [:type-of-establishment-code])
       (as-> $
           (tc/write! $ (str "./data/" (tc/dataset-name $)))))
+
   )
 
 
@@ -718,8 +719,8 @@
 (comment ; Examine structure of edubaseall-send dataset
   (-> (edubaseall-send->ds
        #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
-       #_{::edubaseall-resource-file-name "edubasealldata20240524.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20240717.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20250109.csv"}
        )
       (csv-ds-column-info (update-vals edubaseall-send-columns :csv-col-name)
                           (update-vals edubaseall-send-columns :col-label))
