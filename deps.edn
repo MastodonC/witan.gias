@@ -1,5 +1,5 @@
 {:paths   ["src" "resources"]
- :deps    {org.clojure/clojure        {:mvn/version "1.11.1"}
+ :deps    {org.clojure/clojure        {:mvn/version "1.11.4"}
            techascent/tech.ml.dataset {:mvn/version "7.029"}
            scicloj/tablecloth         {:mvn/version "7.029.2"
                                        :exclusions  [techascent/tech.ml.dataset
