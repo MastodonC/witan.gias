@@ -587,18 +587,20 @@
 
 (comment
   ;; Write distinct establishment types to data file
-  (-> (edubaseall->ds {:column-allowlist (map (update-vals edubaseall-columns :csv-col-name)
-                                              [:type-of-establishment-code    :type-of-establishment-name
-                                               :establishment-type-group-code :establishment-type-group-name
-                                               :further-education-type-name])
-                       :dataset-name     (str (re-find #".+(?=\.csv$)" default-edubaseall-resource-file-name)
-                                              "-establishment-types" ".csv")})
-      (tc/map-columns :further-education-type-name-applicable [:further-education-type-name]
-                      #(when (not= % "Not applicable") %))
-      (tc/drop-columns :further-education-type-name)
-      tc/unique-by
-      (#(tc/order-by % (tc/column-names %)))
-      (as-> $ (tc/write! $ (str "./data/" (tc/dataset-name $)))))
+  (let [establishment-type-cols [:establishment-type-group-code :establishment-type-group-name
+                                 :type-of-establishment-code    :type-of-establishment-name
+                                 :further-education-type-name]]
+    (-> (edubaseall->ds {:column-allowlist (map (update-vals edubaseall-columns :csv-col-name)
+                                                establishment-type-cols)
+                         :dataset-name     (str (re-find #".+(?=\.csv$)" default-edubaseall-resource-file-name)
+                                                "-establishment-types" ".csv")})
+        (tc/map-columns :further-education-type-name-applicable [:further-education-type-name]
+                        #(when (not= % "Not applicable") %))
+        (tc/drop-columns :further-education-type-name)
+        tc/unique-by
+        (tc/reorder-columns establishment-type-cols)
+        (#(tc/order-by % (tc/column-names %)))
+        (as-> $ (tc/write! $ (str "./data/" (tc/dataset-name $))))))
 
   )
 
