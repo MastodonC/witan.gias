@@ -545,20 +545,19 @@
    - CSV file to read: via `::edubaseall-file-path` or `::edubaseall-resource-file-name` (for files in resource folder).
      [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
    - Additional or over-riding options for `->dataset`."
-  ([] (edubaseall->ds {}))
-  ([{::keys [edubaseall-resource-file-name edubaseall-file-path]
-     :or    {edubaseall-resource-file-name default-edubaseall-resource-file-name}
-     :as    options}]
-   (with-open [in (-> (or edubaseall-file-path (io/resource edubaseall-resource-file-name))
-                      io/file
-                      io/input-stream)]
-     (ds/->dataset in (merge {:file-type    :csv
-                              :separator    ","
-                              :dataset-name (or edubaseall-file-path edubaseall-resource-file-name)
-                              :header-row?  true
-                              :key-fn       edubaseall-csv-key-fn
-                              :parser-fn    edubaseall-parser-fn}
-                             options)))))
+  [& {::keys [edubaseall-resource-file-name edubaseall-file-path]
+      :or    {edubaseall-resource-file-name default-edubaseall-resource-file-name}
+      :as    options}]
+  (with-open [in (-> (or edubaseall-file-path (io/resource edubaseall-resource-file-name))
+                     io/file
+                     io/input-stream)]
+    (ds/->dataset in (merge {:file-type    :csv
+                             :separator    ","
+                             :dataset-name (or edubaseall-file-path edubaseall-resource-file-name)
+                             :header-row?  true
+                             :key-fn       edubaseall-csv-key-fn
+                             :parser-fn    edubaseall-parser-fn}
+                            options))))
 
 (comment
   (defn- csv-ds-column-info
@@ -684,38 +683,37 @@
        [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
      - Additional or over-riding options for `->dataset`
        (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
-  ([] (edubaseall-send->ds {}))
-  ([options]
-   (let [sen-provision-type-columns (map (comp keyword (partial format "sen-provision-type-%,d")) (range 1 14))
-         columns-to-read            ((comp distinct concat)
-                                     (keys edubaseall-send-columns)
-                                     sen-provision-type-columns
-                                     [:type-of-resourced-provision-name])
-         csv-columns-to-read        (keep (update-vals edubaseall-columns :csv-col-name) columns-to-read)]
-     (-> (edubaseall->ds (-> options
-                             (dissoc :key-fn :column-blocklist)
-                             (assoc :column-allowlist csv-columns-to-read)))
-         ;; Add `:further-education-type-name-applicable` with contents of `:further-education-type-name` when not "Not applicable"
-         (tc/map-columns :further-education-type-name-applicable [:further-education-type-name]
-                         #(when (not= % "Not applicable") %))
-         ;; Parse `:type-of-resourced-provision-name` into separate booleans for RP & SENU
-         (tc/map-columns :resourced-provision?
-                         [:type-of-resourced-provision-name]
-                         #({"Not applicable"                   false
-                            "Resourced provision"              true
-                            "Resourced provision and SEN unit" true
-                            "SEN unit"                         false} % %))
-         (tc/map-columns :sen-unit?
-                         [:type-of-resourced-provision-name]
-                         #({"Not applicable"                   false
-                            "Resourced provision"              false
-                            "Resourced provision and SEN unit" true
-                            "SEN unit"                         true} % %))
-         ;; Pack non-nil SEN provision type abbreviations into a vector
-         (tc/map-columns :sen-provision-types-vec sen-provision-type-columns #(filterv some? %&))
-         ;; Arrange dataset
-         (tc/select-columns (keys edubaseall-send-columns))
-         (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)")))))))
+  [& {:as options}]
+  (let [sen-provision-type-columns (map (comp keyword (partial format "sen-provision-type-%,d")) (range 1 14))
+        columns-to-read            ((comp distinct concat)
+                                    (keys edubaseall-send-columns)
+                                    sen-provision-type-columns
+                                    [:type-of-resourced-provision-name])
+        csv-columns-to-read        (keep (update-vals edubaseall-columns :csv-col-name) columns-to-read)]
+    (-> (edubaseall->ds (-> options
+                            (dissoc :key-fn :column-blocklist)
+                            (assoc :column-allowlist csv-columns-to-read)))
+        ;; Add `:further-education-type-name-applicable` with contents of `:further-education-type-name` when not "Not applicable"
+        (tc/map-columns :further-education-type-name-applicable [:further-education-type-name]
+                        #(when (not= % "Not applicable") %))
+        ;; Parse `:type-of-resourced-provision-name` into separate booleans for RP & SENU
+        (tc/map-columns :resourced-provision?
+                        [:type-of-resourced-provision-name]
+                        #({"Not applicable"                   false
+                           "Resourced provision"              true
+                           "Resourced provision and SEN unit" true
+                           "SEN unit"                         false} % %))
+        (tc/map-columns :sen-unit?
+                        [:type-of-resourced-provision-name]
+                        #({"Not applicable"                   false
+                           "Resourced provision"              false
+                           "Resourced provision and SEN unit" true
+                           "SEN unit"                         true} % %))
+        ;; Pack non-nil SEN provision type abbreviations into a vector
+        (tc/map-columns :sen-provision-types-vec sen-provision-type-columns #(filterv some? %&))
+        ;; Arrange dataset
+        (tc/select-columns (keys edubaseall-send-columns))
+        (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)"))))))
 
 (defn edubaseall-send->map
   "Read SEND related columns from GIAS edubaseall \"all establishment\" data from CSV file and return as a map keyed by URN
@@ -728,11 +726,10 @@
        [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
      - Additional or over-riding options for `->dataset`
        (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
-  ([] (edubaseall-send->map {}))
-  ([options]
-   (let [edubaseall-send-ds (edubaseall-send->ds options)]
-     (zipmap (edubaseall-send-ds :urn)
-             (tc/rows edubaseall-send-ds :as-maps)))))
+  [& {:as options}]
+  (let [edubaseall-send-ds (edubaseall-send->ds options)]
+    (zipmap (edubaseall-send-ds :urn)
+            (tc/rows edubaseall-send-ds :as-maps))))
 
 (comment ; Examine structure of edubaseall-send dataset
   (-> (edubaseall-send->ds
