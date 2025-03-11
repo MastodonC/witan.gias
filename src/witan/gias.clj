@@ -545,20 +545,19 @@
    - CSV file to read: via `::edubaseall-file-path` or `::edubaseall-resource-file-name` (for files in resource folder).
      [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
    - Additional or over-riding options for `->dataset`."
-  ([] (edubaseall->ds {}))
-  ([{::keys [edubaseall-resource-file-name edubaseall-file-path]
-     :or    {edubaseall-resource-file-name default-edubaseall-resource-file-name}
-     :as    options}]
-   (with-open [in (-> (or edubaseall-file-path (io/resource edubaseall-resource-file-name))
-                      io/file
-                      io/input-stream)]
-     (ds/->dataset in (merge {:file-type    :csv
-                              :separator    ","
-                              :dataset-name (or edubaseall-file-path edubaseall-resource-file-name)
-                              :header-row?  true
-                              :key-fn       edubaseall-csv-key-fn
-                              :parser-fn    edubaseall-parser-fn}
-                             options)))))
+  [& {::keys [edubaseall-resource-file-name edubaseall-file-path]
+      :or    {edubaseall-resource-file-name default-edubaseall-resource-file-name}
+      :as    options}]
+  (with-open [in (-> (or edubaseall-file-path (io/resource edubaseall-resource-file-name))
+                     io/file
+                     io/input-stream)]
+    (ds/->dataset in (merge {:file-type    :csv
+                             :separator    ","
+                             :dataset-name (or edubaseall-file-path edubaseall-resource-file-name)
+                             :header-row?  true
+                             :key-fn       edubaseall-csv-key-fn
+                             :parser-fn    edubaseall-parser-fn}
+                            options))))
 
 (comment
   (defn- csv-ds-column-info
@@ -588,13 +587,20 @@
 
 (comment
   ;; Write distinct establishment types to data file
-  (-> (edubaseall->ds {:column-allowlist (map (update-vals edubaseall-columns :csv-col-name) [:type-of-establishment-code    :type-of-establishment-name
-                                                                                              :establishment-type-group-code :establishment-type-group-name])
-                       :dataset-name     (str (re-find #".+(?=\.csv$)" default-edubaseall-resource-file-name) "-establishment-types" ".csv")})
-      (tc/unique-by)
-      (tc/order-by [:type-of-establishment-code])
-      (as-> $
-          (tc/write! $ (str "./data/" (tc/dataset-name $)))))
+  (let [establishment-type-cols [:establishment-type-group-code :establishment-type-group-name
+                                 :type-of-establishment-code    :type-of-establishment-name
+                                 :further-education-type-name]]
+    (-> (edubaseall->ds {:column-allowlist (map (update-vals edubaseall-columns :csv-col-name)
+                                                establishment-type-cols)
+                         :dataset-name     (str (re-find #".+(?=\.csv$)" default-edubaseall-resource-file-name)
+                                                "-establishment-types" ".csv")})
+        (tc/map-columns :further-education-type-name-applicable [:further-education-type-name]
+                        #(when (not= % "Not applicable") %))
+        (tc/drop-columns :further-education-type-name)
+        tc/unique-by
+        (tc/reorder-columns establishment-type-cols)
+        (#(tc/order-by % (tc/column-names %)))
+        (as-> $ (tc/write! $ (str "./data/" (tc/dataset-name $))))))
 
   )
 
@@ -604,14 +610,19 @@
 (def edubaseall-send-columns
   (as-> [:urn
          :last-changed-date
+         ;; Local Authority
+         :la-code
+         :la-name
          ;; Establishment
          :ukprn
          :establishment-number
          :establishment-name
+         :type-of-establishment-code
          :type-of-establishment-name
+         :establishment-type-group-code
          :establishment-type-group-name
-         :la-code
-         :la-name
+         :further-education-type-name
+         :further-education-type-name-applicable  ; derived
          ;; Status
          :establishment-status-name
          :open-date
@@ -620,7 +631,9 @@
          :phase-of-education-name
          :statutory-low-age
          :statutory-high-age
-         :further-education-type-name
+         #_:nursery-provision-name
+         #_:official-sixth-form-code
+         #_:official-sixth-form-name
          ;; Overall capacity & NOR
          :school-census-date
          :school-capacity
@@ -634,70 +647,75 @@
          :sen-no-stat
          ;; RP & SENU Provision
          #_:type-of-resourced-provision-name
-         :sen-unit?                         ; derived
+         :sen-unit?                               ; derived
          :sen-unit-capacity
          :sen-unit-on-roll
-         :resourced-provision?              ; derived
+         :resourced-provision?                    ; derived
          :resourced-provision-capacity
          :resourced-provision-on-roll
          ;; SEN provision types
-         :sen-provision-types-vec           ; derived
+         :sen-provision-types-vec                 ; derived
          ] $
     ;; Add order and (for columns coming from CSV file) column details
-    (map-indexed (fn [idx k] {k (merge {:col-idx idx
+    (map-indexed (fn [idx k] {k (merge {:col-idx  idx
                                         :col-name k}
                                        (select-keys (edubaseall-columns k) [:csv-col-name :col-label]))}) $)
     (into {} $)
     ;; Add details for derived columns
-    (merge-with merge $ {:sen-provision-types-vec {:derived?  true
-                                                   :col-label "SEN Provision Types (derived)"}
-                         :sen-unit?               {:derived?  true
-                                                   :col-label "SEN Unit? (derived)"}
-                         :resourced-provision?    {:derived?  true
-                                                   :col-label "Resourced Provision? (derived)"}})
+    (merge-with merge $ {:further-education-type-name-applicable {:derived?  true
+                                                                  :col-label "Further education type (when applicable)"}
+                         :sen-unit?                              {:derived?  true
+                                                                  :col-label "SEN Unit? (derived)"}
+                         :resourced-provision?                   {:derived?  true
+                                                                  :col-label "Resourced Provision? (derived)"}
+                         :sen-provision-types-vec                {:derived?  true
+                                                                  :col-label "SEN Provision Types (derived)"}})
     ;; Order the map
     (into (sorted-map-by (partial compare-mapped-keys (update-vals $ :col-idx))) $)))
 
 (defn edubaseall-send->ds
   "Read SEND related columns from GIAS edubaseall \"all establishment\" data from CSV file into a dataset
      with default column names, with additional derived columns:
-     - `:sen-provision-types-vec` - vector of (upper-case) SEN provision type abbreviations extracted from \"SEN1\"-\"SEN13\"
-     - `:resourced-provision?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has RP.
+     - `:further-education-type-name-applicable` - with contents of `:further-education-type-name` where not \"Not applicable\"
      - `:sen-unit?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has a SENU.
+     - `:resourced-provision?` - Boolean indicating if `:type-of-resourced-provision-name` indicates estab. has RP.
+     - `:sen-provision-types-vec` - vector of (upper-case) SEN provision type abbreviations extracted from \"SEN1\"-\"SEN13\"
      Use optional `options` map to specify:
      - CSV file to read: via `::edubaseall-file-path` or `::edubaseall-resource-file-name` (for files in resource folder).
        [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
      - Additional or over-riding options for `->dataset`
        (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
-  ([] (edubaseall-send->ds {}))
-  ([options]
-   (let [sen-provision-type-columns (map (comp keyword (partial format "sen-provision-type-%,d")) (range 1 14))
-         columns-to-read            ((comp distinct concat)
-                                     (keys edubaseall-send-columns)
-                                     sen-provision-type-columns
-                                     [:type-of-resourced-provision-name])
-         csv-columns-to-read        (keep (update-vals edubaseall-columns :csv-col-name) columns-to-read)]
-     (-> (edubaseall->ds (-> options
-                             (dissoc :key-fn :column-blocklist)
-                             (assoc :column-allowlist csv-columns-to-read)))
-         ;; Parse `:type-of-resourced-provision-name` into separate booleans for RP & SENU
-         (tc/map-columns :resourced-provision?
-                         [:type-of-resourced-provision-name]
-                         #({"Not applicable"                   false
-                            "Resourced provision"              true
-                            "Resourced provision and SEN unit" true
-                            "SEN unit"                         false} % %))
-         (tc/map-columns :sen-unit?
-                         [:type-of-resourced-provision-name]
-                         #({"Not applicable"                   false
-                            "Resourced provision"              false
-                            "Resourced provision and SEN unit" true
-                            "SEN unit"                         true} % %))
-         ;; Pack non-nil SEN provision type abbreviations into a vector
-         (tc/map-columns :sen-provision-types-vec sen-provision-type-columns #(filterv some? %&))
-         ;; Arrange dataset
-         (tc/select-columns (keys edubaseall-send-columns))
-         (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)")))))))
+  [& {:as options}]
+  (let [sen-provision-type-columns (map (comp keyword (partial format "sen-provision-type-%,d")) (range 1 14))
+        columns-to-read            ((comp distinct concat)
+                                    (keys edubaseall-send-columns)
+                                    sen-provision-type-columns
+                                    [:type-of-resourced-provision-name])
+        csv-columns-to-read        (keep (update-vals edubaseall-columns :csv-col-name) columns-to-read)]
+    (-> (edubaseall->ds (-> options
+                            (dissoc :key-fn :column-blocklist)
+                            (assoc :column-allowlist csv-columns-to-read)))
+        ;; Add `:further-education-type-name-applicable` with contents of `:further-education-type-name` when not "Not applicable"
+        (tc/map-columns :further-education-type-name-applicable [:further-education-type-name]
+                        #(when (not= % "Not applicable") %))
+        ;; Parse `:type-of-resourced-provision-name` into separate booleans for RP & SENU
+        (tc/map-columns :resourced-provision?
+                        [:type-of-resourced-provision-name]
+                        #({"Not applicable"                   false
+                           "Resourced provision"              true
+                           "Resourced provision and SEN unit" true
+                           "SEN unit"                         false} % %))
+        (tc/map-columns :sen-unit?
+                        [:type-of-resourced-provision-name]
+                        #({"Not applicable"                   false
+                           "Resourced provision"              false
+                           "Resourced provision and SEN unit" true
+                           "SEN unit"                         true} % %))
+        ;; Pack non-nil SEN provision type abbreviations into a vector
+        (tc/map-columns :sen-provision-types-vec sen-provision-type-columns #(filterv some? %&))
+        ;; Arrange dataset
+        (tc/select-columns (keys edubaseall-send-columns))
+        (as-> $ (tc/set-dataset-name $ (str (tc/dataset-name $) " (SEND columns)"))))))
 
 (defn edubaseall-send->map
   "Read SEND related columns from GIAS edubaseall \"all establishment\" data from CSV file and return as a map keyed by URN
@@ -710,11 +728,10 @@
        [Defaults to `::edubaseall-resource-file-name` of `default-edubaseall-resource-file-name`.]
      - Additional or over-riding options for `->dataset`
        (though note that any `:column-allowlist`, `:column-blocklist` or `:key-fn` will be ignored)."
-  ([] (edubaseall-send->map {}))
-  ([options]
-   (let [edubaseall-send-ds (edubaseall-send->ds options)]
-     (zipmap (edubaseall-send-ds :urn)
-             (tc/rows edubaseall-send-ds :as-maps)))))
+  [& {:as options}]
+  (let [edubaseall-send-ds (edubaseall-send->ds options)]
+    (zipmap (edubaseall-send-ds :urn)
+            (tc/rows edubaseall-send-ds :as-maps))))
 
 (comment ; Examine structure of edubaseall-send dataset
   (-> (edubaseall-send->ds
