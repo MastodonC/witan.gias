@@ -10,7 +10,7 @@
 ;;; # Data files
 (def default-edubaseall-resource-file-name
   "Name of default edubaseall resource file containing all establishment data"
-  "edubasealldata20250109.csv")
+  "edubasealldata20250422.csv")
 
 
 
@@ -216,14 +216,14 @@
          {:csv-col-name "FurtherEducationType (name)"
           :col-name     :further-education-type-name
           :col-label    "Further education type"}
-         {:csv-col-name "OfstedLastInsp"
+         {:csv-col-name "OfstedLastInsp"                   ; Not in files downloaded on/after 2025-04-22.
           :col-name     :ofsted-last-insp
           :col-label    "Date of last OFSTED inspection"
           :parser-fn    [:local-date "dd-MM-uuuu"]}
-         {:csv-col-name "OfstedSpecialMeasures (code)"
+         {:csv-col-name "OfstedSpecialMeasures (code)"     ; Not in files downloaded on/after 2025-04-22.
           :col-name     :ofsted-special-measures-code
           :col-label    "OFSTED special measures (code)"}
-         {:csv-col-name "OfstedSpecialMeasures (name)"
+         {:csv-col-name "OfstedSpecialMeasures (name)"     ; Not in files downloaded on/after 2025-04-22.
           :col-name     :ofsted-special-measures-name
           :col-label    "OFSTED special measures"}
          {:csv-col-name "LastChangedDate"
@@ -446,10 +446,10 @@
           :col-name     :previous-establishment-number
           :col-label    "Previous establishment number"
           :parser-fn    :string}
-         {:csv-col-name "OfstedRating (name)"
+         {:csv-col-name "OfstedRating (name)"              ; Not in files downloaded on/after 2025-04-22.
           :col-name     :ofsted-rating-name
           :col-label    "OFSTED rating"}
-         {:csv-col-name "RSCRegion (name)" ; Not in files downloaded on/after 2024-07-17.
+         {:csv-col-name "RSCRegion (name)"                 ; Not in files downloaded on/after 2024-07-17.
           :col-name     :rsc-region-name
           :col-label    "RSC region"}
          {:csv-col-name "Country (name)"
@@ -574,6 +574,7 @@
        #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20240717.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20250109.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20250422.csv"}
        )
       (csv-ds-column-info (update-vals edubaseall-columns :csv-col-name)
                           (update-vals edubaseall-columns :col-label))
@@ -582,6 +583,12 @@
   ;; NOTE: Differences between GIAS edubasealldata exports (from 20240524 on):
   ;; - edubasealldata20240717 vs. edubasealldata20240524:
   ;;   - Column :rsc-region-name "RSCRegion (name)" dropped.
+  ;; - edubasealldata20250422.csv vs. "edubasealldata20250109.csv"
+  ;;   - OFSTED inspection columns dropped:
+  ;;     - "OfstedLastInsp"
+  ;;     - "OfstedSpecialMeasures (code)"
+  ;;     - "OfstedSpecialMeasures (name)"
+  ;;     - "OfstedRating (name)"
   )
 
 
@@ -738,6 +745,7 @@
        #_{::edubaseall-file-path "/tmp/edubasealldata20230421.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20240717.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20250109.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20250422.csv"}
        )
       (csv-ds-column-info (update-vals edubaseall-send-columns :csv-col-name)
                           (update-vals edubaseall-send-columns :col-label))
