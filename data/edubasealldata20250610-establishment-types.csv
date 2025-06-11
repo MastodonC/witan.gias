@@ -1,0 +1,51 @@
+establishment-type-group-code,establishment-type-group-name,type-of-establishment-code,type-of-establishment-name,further-education-type-name-applicable
+1,Colleges,18,Further education,
+1,Colleges,18,Further education,"Art, Design and Performing Arts College"
+1,Colleges,18,Further education,General Further Education College
+1,Colleges,18,Further education,Land-Based College
+1,Colleges,18,Further education,Sixth Form College (General)
+1,Colleges,18,Further education,Sixth Form College (Voluntary Aided)
+1,Colleges,18,Further education,Sixth Form College (Voluntary Controlled)
+1,Colleges,18,Further education,Specialist Designated College
+1,Colleges,18,Further education,Tertiary College
+1,Colleges,31,Sixth form centres,
+2,Universities,29,Higher education institutions,
+2,Universities,29,Higher education institutions,"Art, Design and Performing Arts College"
+3,Independent schools,6,City technology college,
+3,Independent schools,11,Other independent school,
+4,Local authority maintained schools,1,Community school,
+4,Local authority maintained schools,2,Voluntary aided school,
+4,Local authority maintained schools,3,Voluntary controlled school,
+4,Local authority maintained schools,5,Foundation school,
+4,Local authority maintained schools,14,Pupil referral unit,
+4,Local authority maintained schools,15,Local authority nursery school,
+5,Special schools,7,Community special school,
+5,Special schools,8,Non-maintained special school,
+5,Special schools,10,Other independent special school,
+5,Special schools,12,Foundation special school,
+6,Welsh schools,30,Welsh establishment,
+9,Other types,24,Secure units,
+9,Other types,25,Offshore schools,
+9,Other types,26,Service children's education,
+9,Other types,27,Miscellaneous,
+9,Other types,27,Miscellaneous,Specialist Designated College
+9,Other types,32,Special post 16 institution,
+9,Other types,32,Special post 16 institution,Specialist Designated College
+9,Other types,37,British schools overseas,
+9,Other types,56,Institution funded by other government department,Specialist Designated College
+10,Academies,28,Academy sponsor led,
+10,Academies,33,Academy special sponsor led,
+10,Academies,34,Academy converter,
+10,Academies,42,Academy alternative provision converter,
+10,Academies,43,Academy alternative provision sponsor led,
+10,Academies,44,Academy special converter,
+10,Academies,45,Academy 16-19 converter,
+10,Academies,46,Academy 16 to 19 sponsor led,
+10,Academies,57,Academy secure 16 to 19,
+11,Free Schools,35,Free schools,
+11,Free Schools,36,Free schools special,
+11,Free Schools,38,Free schools alternative provision,
+11,Free Schools,39,Free schools 16 to 19,
+11,Free Schools,40,University technical college,
+11,Free Schools,41,Studio schools,
+13,Online provider,49,Online provider,

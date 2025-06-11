@@ -4,3 +4,7 @@
 .lsp/
 gc.log*
 .clerk/
+.DS_Store
+.vscode/
+*.code-workspace
+.calva/

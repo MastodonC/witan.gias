@@ -10,7 +10,7 @@
 ;;; # Data files
 (def default-edubaseall-resource-file-name
   "Name of default edubaseall resource file containing all establishment data"
-  "edubasealldata20250422.csv")
+  "edubasealldata20250610.csv")
 
 
 
@@ -575,6 +575,7 @@
        #_{::edubaseall-resource-file-name "edubasealldata20240717.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20250109.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20250422.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20250610.csv"}
        )
       (csv-ds-column-info (update-vals edubaseall-columns :csv-col-name)
                           (update-vals edubaseall-columns :col-label))
@@ -746,6 +747,7 @@
        #_{::edubaseall-resource-file-name "edubasealldata20240717.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20250109.csv"}
        #_{::edubaseall-resource-file-name "edubasealldata20250422.csv"}
+       #_{::edubaseall-resource-file-name "edubasealldata20250610.csv"}
        )
       (csv-ds-column-info (update-vals edubaseall-send-columns :csv-col-name)
                           (update-vals edubaseall-send-columns :col-label))
