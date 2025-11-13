@@ -1,7 +1,7 @@
 (ns witan.gias
   "Read in \"Get Information About Schools\" (GIAS) all establishment data from CSV file downloaded from [get-information-schools.service.gov.uk/Downloads](https://www.get-information-schools.service.gov.uk/Downloads)"
   (:require [clojure.java.io :as io]
-            [clojure.string  :as string]
+            [clojure.string]
             [tablecloth.api  :as tc]
             [tech.v3.dataset :as ds]))
 
