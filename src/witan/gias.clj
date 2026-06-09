@@ -10,7 +10,7 @@
 ;;; # Data files
 (def default-edubaseall-resource-file-name
   "Name of default edubaseall resource file containing all establishment data"
-  "edubasealldata20251113.csv")
+  "edubasealldata20260609.csv")
 
 
 
@@ -758,4 +758,3 @@
       (vary-meta assoc :print-index-range 1000))
 
   )
-
